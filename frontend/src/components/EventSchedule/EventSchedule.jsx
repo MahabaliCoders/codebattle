@@ -1,20 +1,35 @@
-import React, { useEffect, useRef } from 'react';
-import { MapPin, Clock, CalendarDays } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapPin, Clock, CalendarDays, Loader } from 'lucide-react';
+import { db } from '../../firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import './EventSchedule.css';
 
-const scheduleData = [
-  { id: 1, title: 'Registration & Welcome', time: '08:00 AM - 09:30 AM', location: 'Main Reception', color: 'blue' },
-  { id: 2, title: 'Opening Keynote', time: '09:30 AM - 11:00 AM', location: 'Grand Auditorium', color: 'purple' },
-  { id: 3, title: 'Tea & Networking Break', time: '11:00 AM - 11:30 AM', location: 'Lobby Area', color: 'orange' },
-  { id: 4, title: 'Tech Symposium Panel', time: '11:30 AM - 01:00 PM', location: 'Seminar Hall A', color: 'green' },
-  { id: 5, title: 'Catered Lunch', time: '01:00 PM - 02:00 PM', location: 'Dining Pavilion', color: 'orange' },
-  { id: 6, title: 'Hackathon Kickoff', time: '02:00 PM - 05:00 PM', location: 'Innovation Lab', color: 'blue' },
-  { id: 7, title: 'Closing Ceremony', time: '05:00 PM - 06:00 PM', location: 'Grand Auditorium', color: 'purple' },
-  { id: 8, title: 'Afterparty & Dinner', time: '06:30 PM - 09:00 PM', location: 'Campus Central Gardens', color: 'orange' }
-];
-
 const EventSchedule = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const timelineRef = useRef(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'events'), orderBy('date', 'asc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const eventList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      // Secondary sort by time if dates are same
+      eventList.sort((a, b) => {
+        if (a.date === b.date) {
+          return a.time.localeCompare(b.time);
+        }
+        return 0;
+      });
+
+      setEvents(eventList);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Smooth mouse scroll for horizontal container
   const handleWheel = (e) => {
@@ -32,17 +47,21 @@ const EventSchedule = () => {
       el.addEventListener('wheel', handleWheel, { passive: false });
       return () => el.removeEventListener('wheel', handleWheel);
     }
-  }, []);
+  }, [loading]);
+
+  if (loading) return <div className="loading-state">Synchronizing Campus Schedule...</div>;
 
   return (
-    <div className="schedule-container">
+    <div className="schedule-container fade-in">
       <div className="schedule-header">
         <div className="schedule-title-group">
           <h1>Event Schedule</h1>
-          <p>October 15, 2026 • Main Campus</p>
+          <p>Live Timeline of Upcoming Activities</p>
         </div>
         <div className="schedule-actions">
-           <button className="btn-today"><CalendarDays size={16} /> Today</button>
+           <div className="live-status-pill">
+              <span className="live-dot"></span> Firestore Synchronized
+           </div>
         </div>
       </div>
 
@@ -50,26 +69,31 @@ const EventSchedule = () => {
         <div className="timeline-scroll-container" ref={timelineRef}>
           <div className="timeline-line"></div>
           
-          {scheduleData.map((event, index) => (
+          {events.length > 0 ? events.map((event, index) => (
             <div 
               key={event.id} 
-              className={`timeline-block color-${event.color}`}
+              className={`timeline-block color-${['blue', 'purple', 'orange', 'green'][index % 4]}`}
               style={{ animationDelay: `${index * 0.15}s` }}
             >
               <div className="time-marker"></div>
               <div className="block-content">
                 <div className="block-time">
                   <Clock size={14} />
-                  <span>{event.time}</span>
+                  <span>{event.date} • {event.time}</span>
                 </div>
-                <h3 className="block-title">{event.title}</h3>
+                <h3 className="block-title">{event.eventName}</h3>
                 <div className="block-location">
                   <MapPin size={14} />
-                  <span>{event.location}</span>
+                  <span>{event.venue || 'TBA'}</span>
                 </div>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="empty-timeline-msg">
+              <h3>No scheduled events.</h3>
+              <p>Events added by coordinators will appear here on the master timeline.</p>
+            </div>
+          )}
           
           <div className="timeline-spacer"></div>
         </div>

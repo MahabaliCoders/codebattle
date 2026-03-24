@@ -14,9 +14,9 @@ import {
 import './TaskAssignment.css';
 
 const columns = [
-  { id: 'todo', title: 'To Do' },
-  { id: 'inProgress', title: 'In Progress' },
-  { id: 'done', title: 'Done' }
+  { id: 'todo', title: 'Pending' },
+  { id: 'inProgress', title: 'Ongoing' },
+  { id: 'done', title: 'Completed' }
 ];
 
 const TaskAssignment = () => {
@@ -24,9 +24,10 @@ const TaskAssignment = () => {
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [newTask, setNewTask] = useState({ title: '', assignee: '', deadline: '', priority: 'medium' });
+  const [newTask, setNewTask] = useState({ title: '', assignee: '', deadline: '', priority: 'medium', progress: 0 });
   const userRole = localStorage.getItem('userRole')?.toLowerCase() || 'user';
-  const canManage = ['admin', 'lead', 'event-lead'].includes(userRole);
+  const canManage = ['lead', 'event-lead'].includes(userRole);
+  const isAdmin = userRole === 'admin';
 
   // Listen for real-time task updates
   useEffect(() => {
@@ -44,7 +45,7 @@ const TaskAssignment = () => {
 
   // Drag and Drop Handlers
   const handleDragStart = (e, id) => {
-    if (!canManage) return; // Only leads can move tasks
+    if (!canManage) return; 
     setDraggedTaskId(id);
     e.dataTransfer.effectAllowed = "move";
     setTimeout(() => {
@@ -88,7 +89,7 @@ const TaskAssignment = () => {
         createdAt: serverTimestamp()
       });
       
-      setNewTask({ title: '', assignee: '', deadline: '', priority: 'medium' });
+      setNewTask({ title: '', assignee: '', deadline: '', priority: 'medium', progress: 0 });
       setIsPanelOpen(false);
     } catch (err) {
       console.error("Error creating task:", err);
@@ -98,19 +99,25 @@ const TaskAssignment = () => {
   return (
     <div className="task-board-container">
       <div className="board-header">
-        <div>
-          <h1>Task Board</h1>
-          <p>{canManage ? 'Organize and track event tasks.' : 'View your assigned tasks and progress.'}</p>
-        </div>
+        <div className="welcome-tag">COORDINATOR PORTAL</div>
+        <h1 className="board-title-text">Event Ops & Logistics</h1>
+        <p className="board-subtitle">
+          {canManage 
+            ? 'Strategic center for managing sound, decoration, and goodies.' 
+            : isAdmin 
+              ? 'Supervisory View: Monitoring operational progress of event leads.' 
+              : 'Read-only View: Current event task statuses.'}
+        </p>
+        
         {canManage && (
-          <button className="btn-create-task" onClick={() => setIsPanelOpen(true)}>
-            <Plus size={18} /> New Task
+          <button className="btn-add-major" onClick={() => setIsPanelOpen(true)}>
+            <Plus size={20} /> Assign New Task
           </button>
         )}
       </div>
 
       {isLoading ? (
-        <div className="loading-tasks">Loading board...</div>
+        <div className="loading-tasks">Loading logistics feed...</div>
       ) : (
         <div className="kanban-layout">
           {columns.map(col => (
@@ -121,8 +128,9 @@ const TaskAssignment = () => {
               onDrop={(e) => handleDrop(e, col.id)}
             >
               <div className="column-header">
+                <div className={`col-dot-premium dot-${col.id}`}></div>
                 <h3>{col.title}</h3>
-                <span className="task-count">{tasks.filter(t => t.status === col.id).length}</span>
+                <span className="task-count-premium">{tasks.filter(t => t.status === col.id).length}</span>
               </div>
               
               <div className="column-body">
@@ -132,26 +140,44 @@ const TaskAssignment = () => {
                     draggable={canManage}
                     onDragStart={(e) => handleDragStart(e, task.id)}
                     onDragEnd={handleDragEnd}
-                    className={`task-card ${!canManage ? 'no-drag' : ''}`}
+                    className={`task-card-premium ${!canManage ? 'no-drag' : ''}`}
                   >
-                    <div className="task-card-header">
-                      <span className={`priority-dot priority-${task.priority}`} title={`Priority: ${task.priority}`}></span>
+                    <div className="task-card-branding">
+                      <span className={`status-pill-mini status-${task.status}`}>
+                        {task.status === 'inProgress' ? 'Ongoing' : task.status === 'done' ? 'Completed' : 'Pending'}
+                      </span>
+                      <span className={`priority-label-text p-${task.priority}`}>
+                        {task.priority.toUpperCase()} PRIORITY
+                      </span>
                     </div>
-                    <h4 className="task-title">{task.title}</h4>
-                    <div className="task-footer">
-                      <div className="task-meta">
-                        <UserIcon size={14} />
-                        <span>{task.assignee || 'Unassigned'}</span>
+
+                    <h4 className="premium-task-title">{task.title}</h4>
+
+                    <div className="task-progress-section">
+                       <div className="progress-info">
+                          <span>Progress</span>
+                          <strong>{task.progress || 50}%</strong>
+                       </div>
+                       <div className="premium-progress-bg">
+                          <div className="premium-progress-fill" style={{width: `${task.progress || 50}%`}}></div>
+                       </div>
+                    </div>
+
+                    <div className="task-bottom-meta">
+                      <div className="t-meta-block">
+                        <UserIcon size={12} /> 
+                        <span className="assignee-tag">Assignee:</span>
+                        <span className="assignee-val">{task.assignee || 'nitu'}</span>
                       </div>
-                      <div className="task-meta">
-                        <Calendar size={14} />
-                        <span>{task.deadline || 'No date'}</span>
+                      <div className="t-meta-block">
+                        <Calendar size={12} /> 
+                        <span>{task.deadline || 'TBA'}</span>
                       </div>
                     </div>
                   </div>
                 ))}
                 {tasks.filter(t => t.status === col.id).length === 0 && (
-                  <div className="empty-column-placeholder">No tasks here</div>
+                  <div className="empty-column-placeholder">No tasks recorded</div>
                 )}
               </div>
             </div>
@@ -162,19 +188,20 @@ const TaskAssignment = () => {
       {/* Slide-out Create Task Panel */}
       <div className={`side-panel-overlay ${isPanelOpen ? 'open' : ''}`} onClick={() => setIsPanelOpen(false)}></div>
       <div className={`create-task-panel ${isPanelOpen ? 'open' : ''}`}>
-        <div className="panel-header">
+        <div className="panel-top-bar">
+          <div className="panel-icon-wrap"><Plus size={20} color="#007aff"/></div>
           <h2>Create New Task</h2>
           <button className="close-panel-btn" onClick={() => setIsPanelOpen(false)}>
             <X size={20} />
           </button>
         </div>
         
-        <form className="create-task-form" onSubmit={handleCreateTask}>
-          <div className="form-group">
-            <label>Task Title</label>
+        <form className="create-task-form-modern" onSubmit={handleCreateTask}>
+          <div className="form-section">
+            <label>Task Mission Title</label>
             <input 
               type="text" 
-              className="clean-input" 
+              className="premium-input-field" 
               placeholder="E.g. Confirm Catering Menu" 
               value={newTask.title}
               onChange={(e) => setNewTask({...newTask, title: e.target.value})}
@@ -182,49 +209,58 @@ const TaskAssignment = () => {
             />
           </div>
           
-          <div className="form-group">
-            <label>Assign To</label>
-            <input 
-              type="text" 
-              className="clean-input" 
-              placeholder="Name or Email" 
-              value={newTask.assignee}
-              onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Deadline</label>
-            <input 
-              type="text" 
-              className="clean-input" 
-              placeholder="E.g. Oct 15" 
-              value={newTask.deadline}
-              onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Priority</label>
-            <div className="priority-selector">
-              <label className="radio-label">
-                <input type="radio" value="low" checked={newTask.priority === 'low'} onChange={(e) => setNewTask({...newTask, priority: e.target.value})} />
-                <span className="dot dot-low"></span> Low
-              </label>
-              <label className="radio-label">
-                <input type="radio" value="medium" checked={newTask.priority === 'medium'} onChange={(e) => setNewTask({...newTask, priority: e.target.value})} />
-                <span className="dot dot-medium"></span> Medium
-              </label>
-              <label className="radio-label">
-                <input type="radio" value="high" checked={newTask.priority === 'high'} onChange={(e) => setNewTask({...newTask, priority: e.target.value})} />
-                <span className="dot dot-high"></span> High
-              </label>
+          <div className="form-row">
+            <div className="form-section">
+              <label>Assignee</label>
+              <input 
+                type="text" 
+                className="premium-input-field" 
+                placeholder="Name or Email" 
+                value={newTask.assignee}
+                onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
+              />
+            </div>
+            <div className="form-section">
+              <label>Deadline</label>
+              <input 
+                type="text" 
+                className="premium-input-field" 
+                placeholder="E.g. Oct 15" 
+                value={newTask.deadline}
+                onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
+              />
             </div>
           </div>
 
-          <div className="panel-footer">
-            <button type="button" className="btn-cancel" onClick={() => setIsPanelOpen(false)}>Cancel</button>
-            <button type="submit" className="btn-submit">Add Task</button>
+          <div className="form-section">
+            <label>Priority Matrix</label>
+            <div className="priority-horizontal-scroll">
+               <button 
+                  type="button" 
+                  className={`p-btn p-low ${newTask.priority === 'low' ? 'active' : ''}`}
+                  onClick={() => setNewTask({...newTask, priority: 'low'})}
+               >Low</button>
+               <button 
+                  type="button" 
+                  className={`p-btn p-medium ${newTask.priority === 'medium' ? 'active' : ''}`}
+                  onClick={() => setNewTask({...newTask, priority: 'medium'})}
+               >Medium</button>
+               <button 
+                  type="button" 
+                  className={`p-btn p-high ${newTask.priority === 'high' ? 'active' : ''}`}
+                  onClick={() => setNewTask({...newTask, priority: 'high'})}
+               >High</button>
+               <button 
+                  type="button" 
+                  className={`p-btn p-urgent ${newTask.priority === 'urgent' ? 'active' : ''}`}
+                  onClick={() => setNewTask({...newTask, priority: 'urgent'})}
+               >Urgent</button>
+            </div>
+          </div>
+
+          <div className="form-actions-fixed">
+            <button type="button" className="action-btn-secondary" onClick={() => setIsPanelOpen(false)}>Discard</button>
+            <button type="submit" className="action-btn-primary">Initialize Task</button>
           </div>
         </form>
       </div>

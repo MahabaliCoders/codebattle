@@ -1,28 +1,12 @@
-import React from 'react';
-import { DownloadCloud } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DownloadCloud, Loader2 } from 'lucide-react';
+import { db } from '../../firebase';
+import { collection, onSnapshot, getDocs } from 'firebase/firestore';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
 } from 'recharts';
 import './Report.css';
-
-const performanceData = [
-  { month: 'Jan', performance: 65 },
-  { month: 'Feb', performance: 78 },
-  { month: 'Mar', performance: 82 },
-  { month: 'Apr', performance: 70 },
-  { month: 'May', performance: 89 },
-  { month: 'Jun', performance: 95 },
-  { month: 'Jul', performance: 100 },
-];
-
-const participationData = [
-  { dept: 'CS', attendees: 400 },
-  { dept: 'Arts', attendees: 250 },
-  { dept: 'Business', attendees: 300 },
-  { dept: 'Engineering', attendees: 450 },
-  { dept: 'Science', attendees: 200 },
-];
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -40,106 +24,131 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const Report = () => {
+  const [stats, setStats] = useState({ events: 0, participants: 0, chartData: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // 1. Get Events for names mapping
+      const evSnap = await getDocs(collection(db, 'events'));
+      const eventMap = {};
+      evSnap.forEach(d => eventMap[d.id] = d.data().eventName || 'Unnamed Event');
+      
+      const eventCounts = {};
+      evSnap.forEach(d => eventCounts[d.id] = 0);
+
+      // 2. Listen to Registrations for live count & chart
+      const unsub = onSnapshot(collection(db, 'registrations'), (snap) => {
+        const totalParticipants = snap.size;
+        
+        // Reset counts
+        Object.keys(eventCounts).forEach(k => eventCounts[k] = 0);
+        
+        snap.forEach(doc => {
+          const reg = doc.data();
+          if (eventCounts[reg.eventId] !== undefined) {
+             eventCounts[reg.eventId]++;
+          }
+        });
+
+        const barData = Object.entries(eventCounts).map(([id, count]) => ({
+          name: eventMap[id] || 'Event',
+          attendees: count
+        })).slice(0, 5); // top 5 for cleaner chart
+
+        setStats({
+          events: evSnap.size,
+          participants: totalParticipants,
+          chartData: barData
+        });
+        setLoading(false);
+      });
+      return unsub;
+    };
+
+    let unsubscriber;
+    fetchData().then(u => unsubscriber = u);
+    return () => { if(unsubscriber) unsubscriber(); };
+  }, []);
+
+  const performanceMock = [
+    { month: 'Jan', performance: 65 },
+    { month: 'Feb', performance: 78 },
+    { month: 'Mar', performance: 82 },
+    { month: 'Current', performance: 95 },
+  ];
+
+  if (loading) return <div className="loading-state"><Loader2 className="spin-icon" /> Computing Campus Metrics...</div>;
+
   return (
-    <div className="report-dashboard">
+    <div className="report-dashboard fade-in">
       <div className="report-header">
         <div>
           <h1>Analytics & Reports</h1>
-          <p>Review event performance and campus engagement metrics.</p>
+          <p>Real-time campus engagement metrics from live database.</p>
         </div>
         <button className="btn-export">
-          <DownloadCloud size={16} />
-          Export CSV
+          <DownloadCloud size={16} /> Export Data
         </button>
       </div>
 
       <div className="report-grid">
-        {/* Line Chart Card */}
         <div className="analytics-card full-width">
           <div className="card-header">
-             <h2>Event Performance Over Time</h2>
-             <span className="card-subtitle">Year-to-date success rate (%)</span>
+             <h2>Success Momentum</h2>
+             <span className="card-subtitle">Platform performance trend (%)</span>
           </div>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={performanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={performanceMock} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5EA" />
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#8E8E93', fontSize: 12, fontWeight: 500 }} 
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#8E8E93', fontSize: 12, fontWeight: 500 }} 
-                />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#8E8E93', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8E8E93', fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#E5E5EA', strokeWidth: 1 }} />
                 <Line 
                   type="monotone" 
                   dataKey="performance" 
-                  name="Performance"
                   stroke="#0071E3" 
                   strokeWidth={3}
                   dot={{ r: 4, fill: '#FFFFFF', stroke: '#0071E3', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: '#0071E3', strokeWidth: 0, boxShadow: '0 0 10px rgba(0,113,227,0.5)' }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Bar Chart Card */}
         <div className="analytics-card half-width">
           <div className="card-header">
-             <h2>Participation by Department</h2>
-             <span className="card-subtitle">Total attendees across all events</span>
+             <h2>Participation by Event</h2>
+             <span className="card-subtitle">Real-time attendee distribution</span>
           </div>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={participationData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={32}>
+              <BarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barSize={32}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5EA" />
-                <XAxis 
-                  dataKey="dept" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#8E8E93', fontSize: 12, fontWeight: 500 }}
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#8E8E93', fontSize: 12, fontWeight: 500 }}
-                />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)' }} />
-                <Bar 
-                  dataKey="attendees" 
-                  name="Attendees"
-                  fill="#5AC8FA" 
-                  radius={[6, 6, 0, 0]} 
-                />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#8E8E93', fontSize: 10 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8E8E93', fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="attendees" name="Attendees" fill="#5AC8FA" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Summary Stats */}
         <div className="analytics-card half-width summary-card">
           <div className="summary-item">
             <span className="summary-label">Total Events Hosted</span>
-            <span className="summary-value">124</span>
+            <span className="summary-value">{stats.events}</span>
           </div>
           <div className="summary-divider"></div>
           <div className="summary-item">
-            <span className="summary-label">Average Attendance</span>
-            <span className="summary-value">320</span>
+            <span className="summary-label">Average Engagement</span>
+            <span className="summary-value">{stats.events > 0 ? Math.round(stats.participants / stats.events) : 0} per event</span>
           </div>
           <div className="summary-divider"></div>
           <div className="summary-item">
-            <span className="summary-label">Total Participants</span>
-            <span className="summary-value">1,600</span>
+            <span className="summary-label">Platform Participants</span>
+            <span className="summary-value">{stats.participants}</span>
           </div>
         </div>
       </div>

@@ -9,6 +9,8 @@ import './Dashboards.css';
 const EventLeadDashboard = () => {
   const [myEvents, setMyEvents] = useState([]);
   const [registrationsCount, setRegistrationsCount] = useState(0);
+  const [activeTasks, setActiveTasks] = useState(0);
+  const [teamSize, setTeamSize] = useState(0);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -37,13 +39,24 @@ const EventLeadDashboard = () => {
       setMyEvents(eventsList);
     });
 
-    // 2. Fetch Total Registrations for lead's oversight (simplified to all for now)
+    // 2. Fetch Total Registrations
     const unsubRegs = onSnapshot(collection(db, 'registrations'), (snap) => {
       setRegistrationsCount(snap.size);
+    });
+
+    // 3. Fetch Active Tasks (In Progress)
+    const unsubTasks = onSnapshot(query(collection(db, 'tasks'), where('status', '==', 'inProgress')), (snap) => {
+      setActiveTasks(snap.size);
+    });
+
+    // 4. Fetch Team Size (Leads)
+    const unsubTeam = onSnapshot(collection(db, 'users'), (snap) => {
+      const count = snap.docs.filter(d => ['lead', 'event-lead'].includes(d.data().role?.toLowerCase())).length;
+      setTeamSize(count);
       setLoading(false);
     });
 
-    return () => { unsubEvents(); unsubRegs(); };
+    return () => { unsubEvents(); unsubRegs(); unsubTasks(); unsubTeam(); };
   }, []);
 
   const handleCancelEvent = async (eventId) => {
@@ -91,24 +104,24 @@ const EventLeadDashboard = () => {
         </div>
         <div className="stat-card glass-card">
           <div className="stat-header">
-            <h4>Total Participants</h4>
+            <h4>Global Registrations</h4>
             <Users size={20} className="text-success" />
           </div>
           <p className="stat-value">{registrationsCount}</p>
         </div>
         <div className="stat-card glass-card">
           <div className="stat-header">
-            <h4>Active Tasks</h4>
+            <h4>In-Progress Tasks</h4>
             <Activity size={20} className="text-warning" />
           </div>
-          <p className="stat-value">12</p>
+          <p className="stat-value">{activeTasks}</p>
         </div>
         <div className="stat-card glass-card">
           <div className="stat-header">
-            <h4>Team Size</h4>
+            <h4>Campus Team</h4>
             <ListFilter size={20} className="text-info" />
           </div>
-          <p className="stat-value">8</p>
+          <p className="stat-value">{teamSize}</p>
         </div>
       </section>
 

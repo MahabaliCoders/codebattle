@@ -7,8 +7,9 @@ import { doc, setDoc } from 'firebase/firestore';
 import './Login.css';
 
 const Signup = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('');
@@ -42,7 +43,9 @@ const Signup = () => {
       
       // Create user profile with role in Firestore
       await setDoc(doc(db, 'users', user.uid), {
-        name: fullName,
+        name: `${firstName} ${lastName}`.trim(),
+        firstName,
+        lastName,
         email: user.email,
         role: normalizedRole,
         createdAt: new Date().toISOString()
@@ -96,17 +99,33 @@ const Signup = () => {
             </div>
           </div>
 
-          <div className="input-group">
-            <div className="input-icon-wrapper">
-              <UserCircle className="input-icon" size={18} />
-              <input 
-                type="text" 
-                className="apple-input"
-                placeholder="Full Name" 
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required 
-              />
+          <div className="name-input-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="input-group">
+              <div className="input-icon-wrapper">
+                <UserCircle className="input-icon" size={18} />
+                <input 
+                  type="text" 
+                  className="apple-input"
+                  placeholder="First Name" 
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required 
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <div className="input-icon-wrapper">
+                <UserCircle className="input-icon" size={18} />
+                <input 
+                  type="text" 
+                  className="apple-input"
+                  placeholder="Last Name" 
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required 
+                />
+              </div>
             </div>
           </div>
 
