@@ -9,6 +9,8 @@ import './Login.css';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,8 +37,15 @@ const Login = () => {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        // Option to verify if selected role matches:
-        // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
+        
+        // Update user data if firstName and lastName were provided during login
+        if (firstName || lastName) {
+           const { setDoc } = await import('firebase/firestore');
+           await setDoc(doc(db, 'users', user.uid), {
+             firstName: firstName || userData.firstName || '',
+             lastName: lastName || userData.lastName || ''
+           }, { merge: true });
+        }
         
         if (role === 'Admin') navigate('/dashboard/admin');
         if (role === 'Event Lead') navigate('/dashboard/planning');
@@ -92,6 +101,29 @@ const Login = () => {
                  <option value="Event Lead">Event Lead</option>
                  <option value="User">User</option>
                </select>
+            </div>
+          </div>
+
+          <div className="input-group" style={{ display: 'flex', gap: '12px' }}>
+            <div className="input-icon-wrapper" style={{ flex: 1 }}>
+              <UserCircle className="input-icon" size={18} />
+              <input 
+                type="text" 
+                className="apple-input"
+                placeholder="First Name" 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+            <div className="input-icon-wrapper" style={{ flex: 1 }}>
+              <UserCircle className="input-icon" size={18} />
+              <input 
+                type="text" 
+                className="apple-input"
+                placeholder="Last Name" 
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </div>
           </div>
 
