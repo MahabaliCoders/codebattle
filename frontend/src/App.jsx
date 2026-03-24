@@ -14,12 +14,16 @@ import EventSchedule from './components/EventSchedule/EventSchedule';
 import ExecutionTracking from './components/ExecutionTracking/ExecutionTracking';
 import Report from './components/Report/Report';
 import AlertNotification from './components/AlertNotification/AlertNotification';
+import GlobalNotifListener from './components/AlertNotification/GlobalNotifListener';
+import PosterStudio from './components/PosterStudio/PosterStudio';
+import EventCommunityChat from './components/EventCommunityChat/EventCommunityChat';
 import './App.css';
 
 function App() {
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <GlobalNotifListener />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -38,6 +42,8 @@ function App() {
             <Route path="tracking" element={<ExecutionTracking />} />
             <Route path="reports" element={<Report />} />
             <Route path="alerts" element={<AlertNotification />} />
+            <Route path="posters" element={<PosterStudio />} />
+            <Route path="community" element={<EventCommunityChat />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

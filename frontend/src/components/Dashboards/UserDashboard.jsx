@@ -7,7 +7,8 @@ import {
   orderBy, 
   doc, 
   getDoc, 
-  setDoc, 
+  setDoc,
+  addDoc,
   serverTimestamp 
 } from 'firebase/firestore';
 import { Calendar as CalendarIcon, MapPin, User as UserIcon, Check } from 'lucide-react';
@@ -52,17 +53,28 @@ const UserDashboard = () => {
     return () => { unsubEvents(); unsubRegs(); };
   }, []);
 
-  const handleParticipate = async (eventId) => {
+  const handleParticipate = async (event) => {
     const user = auth.currentUser || { uid: 'anonymous-user', email: 'not-provided@example.com' };
 
     try {
-      const regId = `${user.uid}_${eventId}`;
+      const regId = `${user.uid}_${event.id}`;
       await setDoc(doc(db, 'registrations', regId), {
         userId: user.uid,
-        eventId: eventId,
+        eventId: event.id,
         userEmail: user.email,
         registeredAt: serverTimestamp()
       });
+      
+      // Broadcast real-time notification natively
+      await addDoc(collection(db, 'notifications'), {
+        type: 'Success',
+        title: 'New Event Registration',
+        message: `${user.email?.split('@')[0]} just registered for ${event.eventName}!`,
+        createdAt: serverTimestamp(),
+        read: false,
+        eventId: event.id
+      });
+      
       toast.success("Successfully registered for the event!");
     } catch (error) {
       console.error("Registration error:", error);
@@ -136,7 +148,7 @@ const UserDashboard = () => {
                   
                   <button 
                     className={`btn-participate ${isRegistered ? 'registered' : ''}`}
-                    onClick={() => !isRegistered && handleParticipate(event.id)}
+                    onClick={() => !isRegistered && handleParticipate(event)}
                     disabled={isRegistered}
                   >
                     {isRegistered ? 'Already Joined' : 'Participate Now'}
