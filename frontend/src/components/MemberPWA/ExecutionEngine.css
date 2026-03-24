@@ -228,27 +228,45 @@
 
 .error-toast {
   position: fixed;
-  bottom: 100px;
+  bottom: 120px;
   left: 20px;
   right: 20px;
   background: #7f1d1d;
   color: #fca5a5;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 20px;
+  border-radius: 16px;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 16px;
   z-index: 1001;
-  animation: slideUp 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  animation: slideUp 0.3s ease-out;
 }
 
-.error-toast button {
-  margin-left: auto;
+.error-content strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: #fff;
+}
+
+.error-content p {
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.error-close {
   background: rgba(255, 255, 255, 0.1);
   border: none;
   color: #fff;
-  padding: 4px 12px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 @keyframes slideUp {
