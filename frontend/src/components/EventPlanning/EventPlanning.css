@@ -118,22 +118,117 @@
 
 .step-sections-wrapper {
   display: flex;
-  width: 500%; /* 5 steps */
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  /* Dynamic width driven by inline JS style */
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .step-section {
-  width: 20%; /* 1/5 of the wrapper */
+  flex: 1;
   padding: 10px 20px;
   opacity: 0.4;
   transform: scale(0.96);
-  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   box-sizing: border-box;
 }
 
 .step-section.active-section {
   opacity: 1;
   transform: scale(1);
+}
+
+/* Media Upload Styles */
+.media-upload-container {
+  width: 100%;
+}
+
+.image-preview-box {
+  width: 100%;
+  min-height: 250px;
+  background: #f5f5f7;
+  border: 2px dashed #d2d2d7;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.image-preview-box:hover {
+  border-color: #007aff;
+  background: #f0f7ff;
+}
+
+.preview-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.preview-wrap img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.remove-img-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 59, 48, 0.9);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.remove-img-btn:hover {
+  transform: scale(1.1);
+  background: #ff3b30;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.upload-placeholder p {
+  color: #86868b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.file-input-hidden {
+  display: none;
+}
+
+.btn-upload-label {
+  background: white;
+  color: #007aff;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid #007aff;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.1);
+}
+
+.btn-upload-label:hover {
+  background: #007aff;
+  color: white;
 }
 
 .step-section h2 {
