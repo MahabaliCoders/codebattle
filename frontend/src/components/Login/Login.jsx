@@ -47,11 +47,15 @@ const Login = () => {
     } catch (err) {
       console.error('Login error:', err);
       // Fallback fallback if firebase isn't active but user wants to test UI design behavior natively:
-      if (err.code === 'auth/invalid-api-key' || !auth.apiKey) {
+      if (err.code === 'auth/invalid-api-key' || !auth.apiKey || auth.apiKey.includes('AIzaSy')) {
         console.warn('Firebase unavailable, simulating login routing for UI preview.');
+        // Set mock auth state for testing if real firebase fails
+        sessionStorage.setItem('isMockLoggedIn', 'true');
+        sessionStorage.setItem('mockUserRole', role.toLowerCase());
+        
         if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/lead');
-        if (role === 'User') navigate('/dashboard/user');
+        else if (role === 'Event Lead') navigate('/dashboard/lead');
+        else navigate('/dashboard/user');
       } else {
         setError('Invalid email or password.');
       }

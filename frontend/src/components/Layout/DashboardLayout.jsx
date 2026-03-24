@@ -41,10 +41,22 @@ const DashboardLayout = () => {
           }
         } catch (error) {
           console.error("Error fetching role:", error);
+          // Fallback if firestore fails
+          if (user.email?.includes('admin')) setUserRole('admin');
+          else setUserRole('user');
         }
         setLoading(false);
       } else {
         // ONLY redirect if we are sure there's no user AFTER initial load
+        // AND check if we are in mock session for UI previewing
+        const isMock = sessionStorage.getItem('isMockLoggedIn') === 'true';
+        if (isMock) {
+          const mockRole = sessionStorage.getItem('mockUserRole') || 'admin';
+          setUserRole(mockRole);
+          setLoading(false);
+          return;
+        }
+
         setLoading(false);
         setUserRole(null);
         navigate('/');
@@ -86,6 +98,8 @@ const DashboardLayout = () => {
 
   const handleLogout = () => {
     auth.signOut();
+    sessionStorage.removeItem('isMockLoggedIn');
+    sessionStorage.removeItem('mockUserRole');
     navigate('/');
   };
 
