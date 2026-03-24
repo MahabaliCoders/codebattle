@@ -114,12 +114,20 @@
 }
 
 .step-section {
-  width: 20%; /* 1/5 of the wrapper */
-  padding: 10px 20px;
+  width: 16.66%; /* 100 / 6 steps */
+  flex-shrink: 0;
+  padding: 0 10px;
+  box-sizing: border-box;
   opacity: 0.4;
   transform: scale(0.96);
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-  box-sizing: border-box;
+}
+
+.instruction-text-light {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  display: block;
 }
 
 .step-section.active-section {

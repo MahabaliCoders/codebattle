@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import './EventPlanning.css';
-import { Calendar, MapPin, AlignLeft, User, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, AlignLeft, User, CheckCircle, Target } from 'lucide-react';
+import GeofenceSetup from './GeofenceSetup';
 
 const steps = [
   { id: 1, title: 'Event Details', icon: CheckCircle },
   { id: 2, title: 'Date & Time', icon: Calendar },
   { id: 3, title: 'Venue', icon: MapPin },
-  { id: 4, title: 'Description', icon: AlignLeft },
-  { id: 5, title: 'Assign Coordinator', icon: User },
+  { id: 4, title: 'Geofence Setup', icon: Target },
+  { id: 5, title: 'Description', icon: AlignLeft },
+  { id: 6, title: 'Assign Coordinator', icon: User },
 ];
 
 const EventPlanning = () => {
@@ -19,7 +21,10 @@ const EventPlanning = () => {
     time: '',
     venue: '',
     description: '',
-    coordinator: ''
+    coordinator: '',
+    venue_latitude: 12.9716, // Default to a central point
+    venue_longitude: 77.5946,
+    geofence_radius_meters: 100
   });
 
   const handleChange = (e) => {
@@ -38,7 +43,8 @@ const EventPlanning = () => {
       alert('Event Created Successfully!');
       
       setFormData({
-        eventName: '', eventType: '', date: '', time: '', venue: '', description: '', coordinator: ''
+        eventName: '', eventType: '', date: '', time: '', venue: '', description: '', coordinator: '',
+        venue_latitude: 12.9716, venue_longitude: 77.5946, geofence_radius_meters: 100
       });
       setCurrentStep(1);
     }
@@ -80,7 +86,7 @@ const EventPlanning = () => {
 
         {/* Form Sections */}
         <div className="form-body">
-          <div className="step-sections-wrapper" style={{ transform: `translateX(-${(currentStep - 1) * 20}%)` }}>
+          <div className="step-sections-wrapper" style={{ transform: `translateX(-${(currentStep - 1) * (100 / steps.length)}%)`, width: `${steps.length * 100}%` }}>
             
             {/* Step 1: Event Details */}
             <div className={`step-section ${currentStep === 1 ? 'active-section' : ''}`}>
@@ -148,8 +154,29 @@ const EventPlanning = () => {
               </div>
             </div>
 
-            {/* Step 4: Description */}
+            {/* Step 4: Geofence Setup */}
             <div className={`step-section ${currentStep === 4 ? 'active-section' : ''}`}>
+              <h2>Geofence Setup</h2>
+              <p className="instruction-text-light">Define the radius within which participants must be to submit proof of work.</p>
+              <GeofenceSetup 
+                initialValue={{ 
+                  lat: formData.venue_latitude, 
+                  lng: formData.venue_longitude, 
+                  radius: formData.geofence_radius_meters 
+                }}
+                onUpdate={(data) => {
+                  setFormData({ 
+                    ...formData, 
+                    venue_latitude: data.lat, 
+                    venue_longitude: data.lng, 
+                    geofence_radius_meters: data.radius 
+                  });
+                }}
+              />
+            </div>
+
+            {/* Step 5: Description */}
+            <div className={`step-section ${currentStep === 5 ? 'active-section' : ''}`}>
               <h2>Description</h2>
               <div className="input-group">
                 <label>Event Overview</label>
@@ -164,8 +191,8 @@ const EventPlanning = () => {
               </div>
             </div>
 
-            {/* Step 5: Assign Coordinator */}
-            <div className={`step-section ${currentStep === 5 ? 'active-section' : ''}`}>
+            {/* Step 6: Assign Coordinator */}
+            <div className={`step-section ${currentStep === 6 ? 'active-section' : ''}`}>
               <h2>Assign Coordinator</h2>
               <div className="input-group">
                 <label>Coordinator</label>
@@ -177,7 +204,6 @@ const EventPlanning = () => {
                 </select>
               </div>
             </div>
-
           </div>
         </div>
 
