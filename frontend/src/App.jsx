@@ -6,39 +6,28 @@ import AdminDashboard from './components/Dashboards/AdminDashboard';
 import EventLeadDashboard from './components/Dashboards/EventLeadDashboard';
 import UserDashboard from './components/Dashboards/UserDashboard';
 import DashboardLayout from './components/Layout/DashboardLayout';
-import AdminDashboard from './components/AdminDashboard/AdminDashboard';
-import EventLeadDashboard from './components/EventLeadDashboard/EventLeadDashboard';
-import UserDashboard from './components/UserDashboard/UserDashboard';
 import EventPlanning from './components/EventPlanning/EventPlanning';
+
 import TaskAssignment from './components/TaskAssignment/TaskAssignment';
 import ParticipantRegistration from './components/ParticipantRegistration/ParticipantRegistration';
 import EventSchedule from './components/EventSchedule/EventSchedule';
 import ExecutionTracking from './components/ExecutionTracking/ExecutionTracking';
 import Report from './components/Report/Report';
 import AlertNotification from './components/AlertNotification/AlertNotification';
-import FirebaseTester from './FirebaseTester';
 import './App.css';
 
 function App() {
   return (
-    <>
-      <FirebaseTester />
-      <BrowserRouter>
-
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         
-        {/* Role-based Dashboard Routes */}
-        <Route path="/dashboard/admin" element={<AdminDashboard />} />
-        <Route path="/dashboard/lead" element={<EventLeadDashboard />} />
-        <Route path="/dashboard/user" element={<UserDashboard />} />
-
-        {/* Keeping original dashboard layout for lead features */}
+        {/* All Dashboard routes nested under DashboardLayout for sidebar visibility */}
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<Navigate to="/dashboard/admin" replace />} />
+          <Route index element={<Navigate to="admin" replace />} />
           <Route path="admin" element={<AdminDashboard />} />
-          <Route path="event-lead" element={<EventLeadDashboard />} />
+          <Route path="lead" element={<EventLeadDashboard />} />
           <Route path="user" element={<UserDashboard />} />
           <Route path="planning" element={<EventPlanning />} />
           <Route path="tasks" element={<TaskAssignment />} />
@@ -48,13 +37,16 @@ function App() {
           <Route path="reports" element={<Report />} />
           <Route path="alerts" element={<AlertNotification />} />
         </Route>
+
+
         
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
     </BrowserRouter>
-    </>
   );
 }
+
 
 export default App;
 

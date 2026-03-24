@@ -39,7 +39,7 @@ const Login = () => {
         // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
         
         if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/event-lead');
+        if (role === 'Event Lead') navigate('/dashboard/lead');
         if (role === 'User') navigate('/dashboard/user');
       } else {
         setError('User profile not found. Please contact an admin.');
@@ -50,12 +50,13 @@ const Login = () => {
       if (err.code === 'auth/invalid-api-key' || !auth.apiKey) {
         console.warn('Firebase unavailable, simulating login routing for UI preview.');
         if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/event-lead');
+        if (role === 'Event Lead') navigate('/dashboard/lead');
         if (role === 'User') navigate('/dashboard/user');
       } else {
         setError('Invalid email or password.');
       }
     } finally {
+
       setIsLoading(false);
     }
   };
