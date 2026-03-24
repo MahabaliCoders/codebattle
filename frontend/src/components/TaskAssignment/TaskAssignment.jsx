@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
-import { Plus, Calendar, User as UserIcon, X } from 'lucide-react';
+import { Plus, Calendar, User as UserIcon, X, Brain } from 'lucide-react';
+import { calculateAvailabilityScores } from '../../utils/taskBalancer';
+import SmartAssignDropdown from './SmartAssignDropdown';
 import './TaskAssignment.css';
+
+const mockWorkers = [
+  { id: 'w1', name: 'Alice Member' },
+  { id: 'w2', name: 'Bob Worker' },
+  { id: 'w3', name: 'Charlie Volunteer' },
+  { id: 'w4', name: 'David Helper' },
+  { id: 'w5', name: 'Eve Support' },
+];
 
 const initialTasks = [
   { id: 't1', title: 'Design Event Poster', assignee: 'Alice M.', deadline: 'Oct 10', priority: 'high', status: 'todo' },
@@ -19,7 +28,12 @@ const TaskAssignment = () => {
   const [tasks, setTasks] = useState(initialTasks);
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [newTask, setNewTask] = useState({ title: '', assignee: '', deadline: '', priority: 'medium' });
+  const [newTask, setNewTask] = useState({ title: '', assigneeId: '', assigneeName: '', deadline: '', priority: 'medium' });
+
+  const workersWithScores = calculateAvailabilityScores(mockWorkers, tasks, { 
+    startTime: null, // Could be linked to a time picker in future
+    endTime: null 
+  });
 
   // Drag and Drop Handlers
   const handleDragStart = (e, id) => {
@@ -58,11 +72,12 @@ const TaskAssignment = () => {
     
     setTasks([...tasks, {
       ...newTask,
+      assignee: newTask.assigneeName, // Keep compatibility with card display
       id: `t${Date.now()}`,
       status: 'todo'
     }]);
     
-    setNewTask({ title: '', assignee: '', deadline: '', priority: 'medium' });
+    setNewTask({ title: '', assigneeId: '', assigneeName: '', deadline: '', priority: 'medium' });
     setIsPanelOpen(false);
   };
 
@@ -145,14 +160,15 @@ const TaskAssignment = () => {
           </div>
           
           <div className="form-group">
-            <label>Assign To</label>
-            <input 
-              type="text" 
-              className="clean-input" 
-              placeholder="Name or Email" 
-              value={newTask.assignee}
-              onChange={(e) => setNewTask({...newTask, assignee: e.target.value})}
-            />
+             <SmartAssignDropdown 
+                workers={workersWithScores}
+                currentSelected={newTask.assigneeId}
+                onSelect={(worker) => setNewTask({ 
+                  ...newTask, 
+                  assigneeId: worker.id, 
+                  assigneeName: worker.name 
+                })}
+             />
           </div>
 
           <div className="form-group">
