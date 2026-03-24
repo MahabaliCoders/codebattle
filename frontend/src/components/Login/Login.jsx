@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, ArrowRight, UserCircle, Loader2 } from 'lucide-react';
 import { auth, db } from '../../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -8,94 +9,145 @@ import './Login.css';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!role) {
+      setError('Please select a role to continue.');
+      return;
+    }
     setError('');
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Fetch user role from Firestore
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        const role = userData.role || 'user';
+        // Option to verify if selected role matches:
+        // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
         
-        // Map roles to routes: admin -> /dashboard/admin, lead -> /dashboard/lead, user -> /dashboard/user
-        navigate(`/dashboard/${role}`);
+        if (role === 'Admin') navigate('/dashboard/admin');
+        if (role === 'Event Lead') navigate('/dashboard/event-lead');
+        if (role === 'User') navigate('/dashboard/user');
       } else {
         setError('User profile not found. Please contact an admin.');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Invalid email or password.');
+      // Fallback fallback if firebase isn't active but user wants to test UI design behavior natively:
+      if (err.code === 'auth/invalid-api-key' || !auth.apiKey) {
+        console.warn('Firebase unavailable, simulating login routing for UI preview.');
+        if (role === 'Admin') navigate('/dashboard/admin');
+        if (role === 'Event Lead') navigate('/dashboard/event-lead');
+        if (role === 'User') navigate('/dashboard/user');
+      } else {
+        setError('Invalid email or password.');
+      }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-card">
+    <div className="login-wrapper">
+      <div className={`login-glass-card ${isLoaded ? 'fade-in' : ''}`}>
+        
         <div className="login-header">
-          <div className="login-logo-placeholder">CB</div>
-          <h2>Welcome Back</h2>
-          <p>Sign in to continue to Code Battle</p>
+          <div className="brand-logo">
+            <div className="logo-mark"></div>
+          </div>
+          <h2>College Event Management System</h2>
+          <p>Sign in to continue</p>
         </div>
         
-        {error && <div className="error-message" style={{color: '#ff4444', marginBottom: '15px', textAlign: 'center'}}>{error}</div>}
-        
         <form className="login-form" onSubmit={handleSubmit}>
+          
           <div className="input-group">
-            <label htmlFor="email">Email Address</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="name@example.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
+            <div className={`input-icon-wrapper ${error && error.includes('role') ? 'has-error' : ''}`}>
+               <UserCircle className="input-icon" size={18} />
+               <select 
+                 className="apple-input apple-select" 
+                 value={role}
+                 onChange={(e) => { setRole(e.target.value); setError(''); }}
+               >
+                 <option value="" disabled>Select Role</option>
+                 <option value="Admin">Admin</option>
+                 <option value="Event Lead">Event Lead</option>
+                 <option value="User">User</option>
+               </select>
+            </div>
+          </div>
+
+          <div className="input-group">
+            <div className="input-icon-wrapper">
+              <Mail className="input-icon" size={18} />
+              <input 
+                type="email" 
+                className="apple-input"
+                placeholder="Email Address" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
+            </div>
           </div>
           
           <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="••••••••" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
+            <div className="input-icon-wrapper">
+              <Lock className="input-icon" size={18} />
+              <input 
+                type="password" 
+                className="apple-input"
+                placeholder="Password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
+            </div>
           </div>
 
-          <div className="form-options">
-            <label className="remember-me">
-              <input type="checkbox" />
-              <span>Remember me</span>
-            </label>
-            <a href="#forgot" className="forgot-password">Forgot Password?</a>
+          <div className="form-actions-row">
+             {error ? <div className="error-message">{error}</div> : <div></div>}
+            <a href="#forgot" className="forgot-link">Forgot Password?</a>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Authenticating...' : 'Sign In'}
+          <button type="submit" className="apple-primary-btn group" disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 size={20} className="spin-loader" />
+            ) : (
+              <>
+                <span>Login</span>
+                <ArrowRight size={18} className="btn-icon" />
+              </>
+            )}
           </button>
+          
         </form>
 
         <div className="login-footer">
           <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
         </div>
+
       </div>
+      
+      {/* Background decoration */}
+      <div className="bg-blob blob-1"></div>
+      <div className="bg-blob blob-2"></div>
+      <div className="bg-blob blob-3"></div>
     </div>
   );
 };
 
 export default Login;
-

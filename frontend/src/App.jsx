@@ -6,6 +6,9 @@ import AdminDashboard from './components/Dashboards/AdminDashboard';
 import EventLeadDashboard from './components/Dashboards/EventLeadDashboard';
 import UserDashboard from './components/Dashboards/UserDashboard';
 import DashboardLayout from './components/Layout/DashboardLayout';
+import AdminDashboard from './components/AdminDashboard/AdminDashboard';
+import EventLeadDashboard from './components/EventLeadDashboard/EventLeadDashboard';
+import UserDashboard from './components/UserDashboard/UserDashboard';
 import EventPlanning from './components/EventPlanning/EventPlanning';
 import TaskAssignment from './components/TaskAssignment/TaskAssignment';
 import ParticipantRegistration from './components/ParticipantRegistration/ParticipantRegistration';
@@ -29,7 +32,10 @@ function App() {
 
         {/* Keeping original dashboard layout for lead features */}
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<Navigate to="/dashboard/planning" replace />} />
+          <Route index element={<Navigate to="/dashboard/admin" replace />} />
+          <Route path="admin" element={<AdminDashboard />} />
+          <Route path="event-lead" element={<EventLeadDashboard />} />
+          <Route path="user" element={<UserDashboard />} />
           <Route path="planning" element={<EventPlanning />} />
           <Route path="tasks" element={<TaskAssignment />} />
           <Route path="participants" element={<ParticipantRegistration />} />

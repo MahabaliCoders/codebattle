@@ -1,0 +1,67 @@
+.dashboard-page {
+  animation: pageFadeIn 0.5s ease forwards;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-header-clean h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.dashboard-header-clean p {
+  color: #86868b;
+  font-size: 1rem;
+  margin-bottom: 32px;
+}
+
+.content-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.mock-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.03), 0 1px 4px rgba(0,0,0,0.02);
+  flex: 1;
+  min-width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0,0,0,0.015);
+}
+
+.mock-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.mock-card.full-width {
+  width: 100%;
+  flex: none;
+}
+
+.mock-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 12px 0;
+}
+
+.subtext {
+  color: #86868b;
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin: 0;
+}
