@@ -1,0 +1,220 @@
+/* f:\codebattle\codebattle\frontend\src\components\ParticipantRegistration\ParticipantRegistration.css */
+
+.participants-dashboard {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding-bottom: 40px;
+}
+
+.participants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .participants-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.participants-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.participants-header p {
+  color: #86868b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #86868b;
+}
+
+.search-bar input {
+  padding: 10px 16px 10px 36px;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1d1d1f;
+  width: 240px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+.btn-export-records {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  color: #1d1d1f;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.btn-export-records:hover {
+  background: #f5f5f7;
+}
+
+/* Card & Table */
+.participants-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.02);
+  overflow: hidden;
+}
+
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.participants-table th {
+  background: #f5f5f7;
+  padding: 16px 24px;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #86868b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.participants-table td {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f2f2f7;
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+
+.participants-table tr:last-child td {
+  border-bottom: none;
+}
+
+.participants-table tbody tr:hover td {
+  background: #f9f9fb;
+}
+
+.id-col {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  color: #86868b;
+}
+
+.participant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.p-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.p-email {
+  font-size: 0.85rem;
+  color: #007aff;
+}
+
+.p-college {
+  font-size: 0.8rem;
+  color: #86868b;
+}
+
+.event-col {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+.date-col {
+  font-size: 0.9rem;
+  color: #86868b;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.type-badge.individual { background: #f0f9ff; color: #007aff; }
+.type-badge.team { background: #fdf4ff; color: #af52de; }
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-badge.success {
+  background: #f0fdf4;
+  color: #34c759;
+}
+
+.empty-records {
+  padding: 80px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-records h3 {
+  margin: 16px 0 8px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.empty-records p {
+  margin: 0;
+  color: #86868b;
+  font-size: 0.95rem;
+  max-width: 300px;
+}
