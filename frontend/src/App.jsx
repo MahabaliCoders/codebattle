@@ -14,6 +14,7 @@ import ExecutionTracking from './components/ExecutionTracking/ExecutionTracking'
 import Report from './components/Report/Report';
 import AlertNotification from './components/AlertNotification/AlertNotification';
 import EventCommunityChat from './components/EventCommunityChat/EventCommunityChat';
+import ExecutionEngine from './components/MemberPWA/ExecutionEngine';
 import './App.css';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <Route path="reports" element={<Report />} />
           <Route path="alerts" element={<AlertNotification />} />
           <Route path="community" element={<EventCommunityChat />} />
+          <Route path="execution" element={<ExecutionEngine />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />
