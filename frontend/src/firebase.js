@@ -1,11 +1,10 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
   apiKey: "AIzaSyCuzH1qysSST5rn7vL0cePCtYUIEzJ9uNs",
   authDomain: "eventplanner-387be.firebaseapp.com",
@@ -16,10 +15,33 @@ const firebaseConfig = {
   measurementId: "G-QK027VYDB4"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase (Check if already initialized for hot-reloading)
+const isAppNewlyCreated = getApps().length === 0;
+const app = isAppNewlyCreated ? initializeApp(firebaseConfig) : getApp();
 
-export { auth, db, analytics };
+// Initialize Auth
+const auth = getAuth(app);
+
+// Initialize Firestore with Offline Persistence (the 'perfect' way for HMR)
+let db;
+if (isAppNewlyCreated) {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    })
+  });
+} else {
+  db = getFirestore(app);
+}
+
+// Initialize Analytics safely
+let analytics = null;
+isSupported().then(supported => {
+  if (supported) {
+    analytics = getAnalytics(app);
+  }
+}).catch(err => {
+  // Silently handle analytics failures (e.g. ad blockers)
+});
+
+export { app, auth, db, analytics };

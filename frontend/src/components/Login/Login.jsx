@@ -9,8 +9,6 @@ import './Login.css';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,19 +35,12 @@ const Login = () => {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        const detectedRole = userData.role || role.toLowerCase().replace(' ', '-');
+        localStorage.setItem('userRole', detectedRole); // Cache for DashboardLayout
         
-        // Update user data if firstName and lastName were provided during login
-        if (firstName || lastName) {
-           const { setDoc } = await import('firebase/firestore');
-           await setDoc(doc(db, 'users', user.uid), {
-             firstName: firstName || userData.firstName || '',
-             lastName: lastName || userData.lastName || ''
-           }, { merge: true });
-        }
-        
-        if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/planning');
-        if (role === 'User') navigate('/dashboard/user');
+        if (detectedRole === 'admin') navigate('/dashboard/admin');
+        else if (detectedRole === 'event-lead') navigate('/dashboard/event-lead');
+        else navigate('/dashboard/user');
       } else {
         setError('User profile not found. Please contact an admin.');
       }
@@ -58,12 +49,13 @@ const Login = () => {
       // Fallback fallback if firebase isn't active but user wants to test UI design behavior natively:
       if (err.code === 'auth/invalid-api-key' || !auth.apiKey || auth.apiKey.includes('AIzaSy')) {
         console.warn('Firebase unavailable, simulating login routing for UI preview.');
-        // Set mock auth state for testing if real firebase fails
+        const mockRole = role.toLowerCase().replace(' ', '-');
+        localStorage.setItem('userRole', mockRole); // Cache for DashboardLayout
         sessionStorage.setItem('isMockLoggedIn', 'true');
-        sessionStorage.setItem('mockUserRole', role.toLowerCase());
+        sessionStorage.setItem('mockUserRole', mockRole);
         
-        if (role === 'Admin') navigate('/dashboard/admin');
-        else if (role === 'Event Lead') navigate('/dashboard/planning');
+        if (mockRole === 'admin') navigate('/dashboard/admin');
+        else if (mockRole === 'event-lead') navigate('/dashboard/event-lead');
         else navigate('/dashboard/user');
       } else {
         setError('Invalid email or password.');
@@ -101,29 +93,6 @@ const Login = () => {
                  <option value="Event Lead">Event Lead</option>
                  <option value="User">User</option>
                </select>
-            </div>
-          </div>
-
-          <div className="input-group" style={{ display: 'flex', gap: '12px' }}>
-            <div className="input-icon-wrapper" style={{ flex: 1 }}>
-              <UserCircle className="input-icon" size={18} />
-              <input 
-                type="text" 
-                className="apple-input"
-                placeholder="First Name" 
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-            </div>
-            <div className="input-icon-wrapper" style={{ flex: 1 }}>
-              <UserCircle className="input-icon" size={18} />
-              <input 
-                type="text" 
-                className="apple-input"
-                placeholder="Last Name" 
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
             </div>
           </div>
 

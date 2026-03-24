@@ -8,10 +8,9 @@ import './Login.css';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,18 +38,23 @@ const Signup = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      const normalizedRole = role.toLowerCase().replace(/ /g, '-');
+      
       // Create user profile with role in Firestore
       await setDoc(doc(db, 'users', user.uid), {
+        name: fullName,
         email: user.email,
-        firstName: firstName,
-        lastName: lastName,
-        role: role.toLowerCase().replace(/ /g, '-'),
+        role: normalizedRole,
         createdAt: new Date().toISOString()
       });
 
+      // Cache for DashboardLayout to avoid rendering lag
+      localStorage.setItem('userRole', normalizedRole); 
+
       // Navigate to the appropriate dashboard based on role
-      const rolePath = role === 'Admin' ? 'admin' : (role === 'Event Lead' ? 'lead' : 'user');
-      navigate(`/dashboard/${rolePath}`);
+      if (normalizedRole === 'admin') navigate('/dashboard/admin');
+      else if (normalizedRole === 'event-lead') navigate('/dashboard/event-lead');
+      else navigate('/dashboard/user');
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.message || 'Error signing up');
@@ -92,26 +96,15 @@ const Signup = () => {
             </div>
           </div>
 
-          <div className="input-group" style={{ display: 'flex', gap: '12px' }}>
-            <div className="input-icon-wrapper" style={{ flex: 1 }}>
+          <div className="input-group">
+            <div className="input-icon-wrapper">
               <UserCircle className="input-icon" size={18} />
               <input 
                 type="text" 
                 className="apple-input"
-                placeholder="First Name" 
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required 
-              />
-            </div>
-            <div className="input-icon-wrapper" style={{ flex: 1 }}>
-              <UserCircle className="input-icon" size={18} />
-              <input 
-                type="text" 
-                className="apple-input"
-                placeholder="Last Name" 
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Full Name" 
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required 
               />
             </div>

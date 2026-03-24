@@ -1,3 +1,12 @@
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px);
+  width: 100%;
+}
+
 .event-planning-container {
   display: flex;
   flex-direction: column;

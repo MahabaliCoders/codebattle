@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, User as UserIcon, X } from 'lucide-react';
+import { db } from '../../firebase';
+import { 
+  collection, 
+  addDoc, 
+  onSnapshot, 
+  updateDoc, 
+  doc, 
+  query, 
+  orderBy,
+  serverTimestamp 
+} from 'firebase/firestore';
 import './TaskAssignment.css';
-
-const initialTasks = [
-  { id: 't1', title: 'Design Event Poster', assignee: 'Alice M.', deadline: 'Oct 10', priority: 'high', status: 'todo' },
-  { id: 't2', title: 'Book Main Auditorium', assignee: 'Bob J.', deadline: 'Oct 5', priority: 'medium', status: 'todo' },
-  { id: 't3', title: 'Send VIP Invitations', assignee: 'Charlie K.', deadline: 'Oct 1', priority: 'high', status: 'inProgress' },
-  { id: 't4', title: 'Initial Budget Approval', assignee: 'Eve S.', deadline: 'Sep 25', priority: 'low', status: 'done' },
-];
 
 const columns = [
   { id: 'todo', title: 'To Do' },
@@ -16,16 +20,33 @@ const columns = [
 ];
 
 const TaskAssignment = () => {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState([]);
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [newTask, setNewTask] = useState({ title: '', assignee: '', deadline: '', priority: 'medium' });
+  const userRole = localStorage.getItem('userRole')?.toLowerCase() || 'user';
+  const canManage = ['admin', 'lead', 'event-lead'].includes(userRole);
+
+  // Listen for real-time task updates
+  useEffect(() => {
+    const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const taskList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setTasks(taskList);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Drag and Drop Handlers
   const handleDragStart = (e, id) => {
+    if (!canManage) return; // Only leads can move tasks
     setDraggedTaskId(id);
     e.dataTransfer.effectAllowed = "move";
-    // Setup for smooth visual handling
     setTimeout(() => {
       e.target.classList.add('dragging');
     }, 0);
@@ -37,33 +58,41 @@ const TaskAssignment = () => {
   };
 
   const handleDragOver = (e) => {
+    if (!canManage) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = (e, status) => {
+  const handleDrop = async (e, status) => {
     e.preventDefault();
-    if (draggedTaskId) {
-      setTasks(tasks.map(t => 
-        t.id === draggedTaskId ? { ...t, status } : t
-      ));
+    if (draggedTaskId && canManage) {
+      try {
+        const taskRef = doc(db, 'tasks', draggedTaskId);
+        await updateDoc(taskRef, { status });
+      } catch (err) {
+        console.error("Error updating task status:", err);
+      }
     }
     setDraggedTaskId(null);
   };
 
   // Create Task Handler
-  const handleCreateTask = (e) => {
+  const handleCreateTask = async (e) => {
     e.preventDefault();
-    if (!newTask.title.trim()) return;
+    if (!newTask.title.trim() || !canManage) return;
     
-    setTasks([...tasks, {
-      ...newTask,
-      id: `t${Date.now()}`,
-      status: 'todo'
-    }]);
-    
-    setNewTask({ title: '', assignee: '', deadline: '', priority: 'medium' });
-    setIsPanelOpen(false);
+    try {
+      await addDoc(collection(db, 'tasks'), {
+        ...newTask,
+        status: 'todo',
+        createdAt: serverTimestamp()
+      });
+      
+      setNewTask({ title: '', assignee: '', deadline: '', priority: 'medium' });
+      setIsPanelOpen(false);
+    } catch (err) {
+      console.error("Error creating task:", err);
+    }
   };
 
   return (
@@ -71,55 +100,64 @@ const TaskAssignment = () => {
       <div className="board-header">
         <div>
           <h1>Task Board</h1>
-          <p>Organize and track event tasks.</p>
+          <p>{canManage ? 'Organize and track event tasks.' : 'View your assigned tasks and progress.'}</p>
         </div>
-        <button className="btn-create-task" onClick={() => setIsPanelOpen(true)}>
-          <Plus size={18} /> New Task
-        </button>
+        {canManage && (
+          <button className="btn-create-task" onClick={() => setIsPanelOpen(true)}>
+            <Plus size={18} /> New Task
+          </button>
+        )}
       </div>
 
-      <div className="kanban-layout">
-        {columns.map(col => (
-          <div 
-            key={col.id} 
-            className="kanban-column"
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, col.id)}
-          >
-            <div className="column-header">
-              <h3>{col.title}</h3>
-              <span className="task-count">{tasks.filter(t => t.status === col.id).length}</span>
-            </div>
-            
-            <div className="column-body">
-              {tasks.filter(t => t.status === col.id).map(task => (
-                <div 
-                  key={task.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, task.id)}
-                  onDragEnd={handleDragEnd}
-                  className="task-card"
-                >
-                  <div className="task-card-header">
-                    <span className={`priority-dot priority-${task.priority}`} title={`Priority: ${task.priority}`}></span>
-                  </div>
-                  <h4 className="task-title">{task.title}</h4>
-                  <div className="task-footer">
-                    <div className="task-meta">
-                      <UserIcon size={14} />
-                      <span>{task.assignee || 'Unassigned'}</span>
+      {isLoading ? (
+        <div className="loading-tasks">Loading board...</div>
+      ) : (
+        <div className="kanban-layout">
+          {columns.map(col => (
+            <div 
+              key={col.id} 
+              className="kanban-column"
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, col.id)}
+            >
+              <div className="column-header">
+                <h3>{col.title}</h3>
+                <span className="task-count">{tasks.filter(t => t.status === col.id).length}</span>
+              </div>
+              
+              <div className="column-body">
+                {tasks.filter(t => t.status === col.id).map(task => (
+                  <div 
+                    key={task.id}
+                    draggable={canManage}
+                    onDragStart={(e) => handleDragStart(e, task.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`task-card ${!canManage ? 'no-drag' : ''}`}
+                  >
+                    <div className="task-card-header">
+                      <span className={`priority-dot priority-${task.priority}`} title={`Priority: ${task.priority}`}></span>
                     </div>
-                    <div className="task-meta">
-                      <Calendar size={14} />
-                      <span>{task.deadline || 'No date'}</span>
+                    <h4 className="task-title">{task.title}</h4>
+                    <div className="task-footer">
+                      <div className="task-meta">
+                        <UserIcon size={14} />
+                        <span>{task.assignee || 'Unassigned'}</span>
+                      </div>
+                      <div className="task-meta">
+                        <Calendar size={14} />
+                        <span>{task.deadline || 'No date'}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+                {tasks.filter(t => t.status === col.id).length === 0 && (
+                  <div className="empty-column-placeholder">No tasks here</div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Slide-out Create Task Panel */}
       <div className={`side-panel-overlay ${isPanelOpen ? 'open' : ''}`} onClick={() => setIsPanelOpen(false)}></div>
