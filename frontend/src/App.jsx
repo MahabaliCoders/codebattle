@@ -17,6 +17,7 @@ import AlertNotification from './components/AlertNotification/AlertNotification'
 import GlobalNotifListener from './components/AlertNotification/GlobalNotifListener';
 import PosterStudio from './components/PosterStudio/PosterStudio';
 import EventCommunityChat from './components/EventCommunityChat/EventCommunityChat';
+import MyTickets from './components/Dashboards/MyTickets';
 import './App.css';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="event-lead" element={<EventLeadDashboard />} />
             <Route path="user" element={<UserDashboard />} />
+            <Route path="my-tickets" element={<MyTickets />} />
             <Route path="planning" element={<EventPlanning />} />
             <Route path="tasks" element={<TaskAssignment />} />
             <Route path="participants" element={<ParticipantRegistration />} />
