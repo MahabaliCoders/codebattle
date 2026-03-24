@@ -3,8 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login/Login';
 import Signup from './components/Login/Signup';
 import DashboardLayout from './components/Layout/DashboardLayout';
+import AdminDashboard from './components/Dashboards/AdminDashboard';
+import EventLeadDashboard from './components/EventLeadDashboard/EventLeadDashboard';
+import UserDashboard from './components/UserDashboard/UserDashboard';
 import EventPlanning from './components/EventPlanning/EventPlanning';
-
 import TaskAssignment from './components/TaskAssignment/TaskAssignment';
 import ParticipantRegistration from './components/ParticipantRegistration/ParticipantRegistration';
 import EventSchedule from './components/EventSchedule/EventSchedule';
@@ -20,14 +22,11 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         
-<<<<<<< HEAD
-=======
         {/* All Dashboard routes nested under DashboardLayout for sidebar visibility */}
->>>>>>> 5c76fec5ed16a493b3f5dfcad530b3564bb1db7f
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<Navigate to="admin" replace />} />
+          <Route index element={<Navigate to="/dashboard/admin" replace />} />
           <Route path="admin" element={<AdminDashboard />} />
-          <Route path="lead" element={<EventLeadDashboard />} />
+          <Route path="event-lead" element={<EventLeadDashboard />} />
           <Route path="user" element={<UserDashboard />} />
           <Route path="planning" element={<EventPlanning />} />
           <Route path="tasks" element={<TaskAssignment />} />
@@ -37,20 +36,11 @@ function App() {
           <Route path="reports" element={<Report />} />
           <Route path="alerts" element={<AlertNotification />} />
         </Route>
-
-
         
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
     </BrowserRouter>
   );
 }
 
-
 export default App;
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 5c76fec5ed16a493b3f5dfcad530b3564bb1db7f

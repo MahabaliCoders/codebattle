@@ -39,7 +39,7 @@ const Login = () => {
         // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
         
         if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/lead');
+        if (role === 'Event Lead') navigate('/dashboard/planning');
         if (role === 'User') navigate('/dashboard/user');
       } else {
         setError('User profile not found. Please contact an admin.');
@@ -54,7 +54,7 @@ const Login = () => {
         sessionStorage.setItem('mockUserRole', role.toLowerCase());
         
         if (role === 'Admin') navigate('/dashboard/admin');
-        else if (role === 'Event Lead') navigate('/dashboard/lead');
+        else if (role === 'Event Lead') navigate('/dashboard/planning');
         else navigate('/dashboard/user');
       } else {
         setError('Invalid email or password.');

@@ -30,8 +30,17 @@ const EventPlanning = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('Event Created!', formData);
+      const newEvent = { ...formData, id: `EVT-${Date.now()}` };
+      const existingEvents = JSON.parse(localStorage.getItem('eventsDirectory') || '[]');
+      localStorage.setItem('eventsDirectory', JSON.stringify([newEvent, ...existingEvents]));
+      
+      console.log('Event Created!', newEvent);
       alert('Event Created Successfully!');
+      
+      setFormData({
+        eventName: '', eventType: '', date: '', time: '', venue: '', description: '', coordinator: ''
+      });
+      setCurrentStep(1);
     }
   };
 
