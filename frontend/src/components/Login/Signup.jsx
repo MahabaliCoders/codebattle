@@ -10,6 +10,8 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,6 +42,8 @@ const Signup = () => {
       // Create user profile with role in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
+        firstName: firstName,
+        lastName: lastName,
         role: role.toLowerCase().replace(/ /g, '-'),
         createdAt: new Date().toISOString()
       });
@@ -85,6 +89,31 @@ const Signup = () => {
                 <option value="Event Lead">Student Coordinator (Event Lead)</option>
                 <option value="Admin">Faculty/Superuser (Admin)</option>
               </select>
+            </div>
+          </div>
+
+          <div className="input-group" style={{ display: 'flex', gap: '12px' }}>
+            <div className="input-icon-wrapper" style={{ flex: 1 }}>
+              <UserCircle className="input-icon" size={18} />
+              <input 
+                type="text" 
+                className="apple-input"
+                placeholder="First Name" 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required 
+              />
+            </div>
+            <div className="input-icon-wrapper" style={{ flex: 1 }}>
+              <UserCircle className="input-icon" size={18} />
+              <input 
+                type="text" 
+                className="apple-input"
+                placeholder="Last Name" 
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required 
+              />
             </div>
           </div>
 
