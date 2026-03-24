@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, UserCircle, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 import { auth, db } from '../../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -9,15 +10,24 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
     
+    if (!role) {
+      return setError('Please select an account type.');
+    }
+
     if (password !== confirmPassword) {
       return setError('Passwords do not match');
     }
@@ -30,12 +40,13 @@ const Signup = () => {
       // Create user profile with role in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
-        role: role,
+        role: role.toLowerCase().replace(/ /g, '-'),
         createdAt: new Date().toISOString()
       });
 
       // Navigate to the appropriate dashboard based on role
-      navigate(`/dashboard/${role}`);
+      const rolePath = role === 'Admin' ? 'admin' : (role === 'Event Lead' ? 'lead' : 'user');
+      navigate(`/dashboard/${rolePath}`);
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.message || 'Error signing up');
@@ -45,70 +56,92 @@ const Signup = () => {
   };
 
   return (
-    <div className="login-page-container">
-      <div className="login-card">
+    <div className="login-wrapper">
+      <div className={`login-glass-card ${isLoaded ? 'fade-in' : ''}`}>
         <div className="login-header">
-          <div className="login-logo-placeholder">CB</div>
+           <div className="brand-logo">
+             <div className="logo-mark" style={{background: 'linear-gradient(135deg, #007aff 0%, #10b981 100%)'}}></div>
+           </div>
           <h2>Create Account</h2>
-          <p>Join Code Battle platform</p>
+          <p>Join the Code Battle platform</p>
         </div>
         
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message" style={{color: '#ff3b30', textAlign: 'center', marginBottom: '16px', fontSize: '0.9rem'}}>{error}</div>}
         
         <form className="login-form" onSubmit={handleSignup}>
-          <div className="input-group">
-            <label htmlFor="email">Email Address</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="name@example.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-          </div>
           
           <div className="input-group">
-            <label htmlFor="role">Account Type</label>
-            <select 
-              id="role" 
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="role-selector"
-            >
-              <option value="user">Participant (User)</option>
-              <option value="lead">Student Coordinator (Event Lead)</option>
-              <option value="admin">Faculty/Superuser (Admin)</option>
-            </select>
-          </div>
-
-
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="••••••••" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
+            <div className="input-icon-wrapper">
+              <UserCircle className="input-icon" size={18} />
+              <select 
+                id="role" 
+                value={role}
+                onChange={(e) => { setRole(e.target.value); setError(''); }}
+                className="apple-input apple-select"
+                required
+              >
+                <option value="" disabled>Select Account Type</option>
+                <option value="User">Participant (User)</option>
+                <option value="Event Lead">Student Coordinator (Event Lead)</option>
+                <option value="Admin">Faculty/Superuser (Admin)</option>
+              </select>
+            </div>
           </div>
 
           <div className="input-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input 
-              type="password" 
-              id="confirmPassword" 
-              placeholder="••••••••" 
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required 
-            />
+            <div className="input-icon-wrapper">
+              <Mail className="input-icon" size={18} />
+              <input 
+                type="email" 
+                id="email" 
+                className="apple-input"
+                placeholder="Email Address" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
+            </div>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Sign Up'}
+          <div className="input-group">
+            <div className="input-icon-wrapper">
+              <Lock className="input-icon" size={18} />
+              <input 
+                type="password" 
+                id="password" 
+                className="apple-input"
+                placeholder="Create Password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <div className="input-icon-wrapper">
+              <ShieldCheck className="input-icon" size={18} />
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                className="apple-input"
+                placeholder="Confirm Password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required 
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="apple-primary-btn" disabled={loading}>
+            {loading ? (
+               <Loader2 size={20} className="spin-loader" />
+            ) : (
+              <>
+                <span>Create Account</span>
+                <ArrowRight size={18} className="btn-icon" />
+              </>
+            )}
           </button>
         </form>
 
@@ -116,8 +149,13 @@ const Signup = () => {
           <p>Already have an account? <Link to="/">Sign In</Link></p>
         </div>
       </div>
+
+      {/* Background decoration */}
+      <div className="bg-blob blob-1" style={{background: 'rgba(16, 185, 129, 0.2)'}}></div>
+      <div className="bg-blob blob-2" style={{background: 'rgba(0, 122, 255, 0.2)'}}></div>
     </div>
   );
 };
 
 export default Signup;
+
