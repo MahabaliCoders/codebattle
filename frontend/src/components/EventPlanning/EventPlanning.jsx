@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { db, auth } from '../../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './EventPlanning.css';
-import { Calendar, MapPin, AlignLeft, User, CheckCircle, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, AlignLeft, User, CheckCircle, Loader2, Upload, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const steps = [
   { id: 1, title: 'Event Details', icon: CheckCircle },
   { id: 2, title: 'Date & Time', icon: Calendar },
   { id: 3, title: 'Venue', icon: MapPin },
-  { id: 4, title: 'Description', icon: AlignLeft },
-  { id: 5, title: 'Assign Coordinator', icon: User },
+  { id: 4, title: 'Poster / Image', icon: Upload },
+  { id: 5, title: 'Description', icon: AlignLeft },
+  { id: 6, title: 'Assign Coordinator', icon: User },
 ];
 
 const EventPlanning = () => {
@@ -23,9 +24,27 @@ const EventPlanning = () => {
     time: '',
     venue: '',
     description: '',
+    eventImage: '',
     coordinatorName: '',
     coordinatorPhone: ''
   });
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) { // 1MB limit for proof of concept
+      toast.error("Image too large. Please select an image under 1MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData({ ...formData, eventImage: reader.result });
+      toast.success("Image uploaded successfully!");
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,7 +52,7 @@ const EventPlanning = () => {
 
   const handleNext = async () => {
     // Validation for phone number
-    if (currentStep === 5) {
+    if (currentStep === 6) {
       if (!formData.coordinatorName.trim()) {
         toast.error("Please enter coordinator name");
         return;
@@ -43,6 +62,11 @@ const EventPlanning = () => {
         toast.error("Please enter a valid 10-digit phone number");
         return;
       }
+    }
+
+    if (currentStep === 4 && !formData.eventImage) {
+        toast.error("Please upload an event poster/image");
+        return;
     }
 
     if (currentStep < steps.length) {
@@ -63,7 +87,7 @@ const EventPlanning = () => {
         toast.success('Event Created Successfully in Cloud!');
         
         setFormData({
-          eventName: '', eventType: '', date: '', time: '', venue: '', description: '', coordinatorName: '', coordinatorPhone: ''
+          eventName: '', eventType: '', date: '', time: '', venue: '', description: '', eventImage: '', coordinatorName: '', coordinatorPhone: ''
         });
         setCurrentStep(1);
       } catch (error) {
@@ -111,7 +135,10 @@ const EventPlanning = () => {
 
         {/* Form Sections */}
         <div className="form-body">
-          <div className="step-sections-wrapper" style={{ transform: `translateX(-${(currentStep - 1) * 20}%)` }}>
+          <div className="step-sections-wrapper" style={{ 
+            transform: `translateX(-${(currentStep - 1) * (100 / steps.length)}%)`,
+            width: `${steps.length * 100}%`
+          }}>
             
             {/* Step 1: Event Details */}
             <div className={`step-section ${currentStep === 1 ? 'active-section' : ''}`}>
@@ -179,8 +206,38 @@ const EventPlanning = () => {
               </div>
             </div>
 
-            {/* Step 4: Description */}
+            {/* Step 4: Poster Image */}
             <div className={`step-section ${currentStep === 4 ? 'active-section' : ''}`}>
+              <h2>Event Media</h2>
+              <div className="media-upload-container">
+                <div className="image-preview-box">
+                  {formData.eventImage ? (
+                    <div className="preview-wrap">
+                      <img src={formData.eventImage} alt="Poster Preview" />
+                      <button className="remove-img-btn" onClick={() => setFormData({...formData, eventImage: ''})}>
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <Upload size={40} opacity={0.3} />
+                      <p>Upload Event Poster / Cover Image</p>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageUpload}
+                        className="file-input-hidden"
+                        id="poster-upload"
+                      />
+                      <label htmlFor="poster-upload" className="btn-upload-label">Browse Files</label>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Step 5: Description */}
+            <div className={`step-section ${currentStep === 5 ? 'active-section' : ''}`}>
               <h2>Description</h2>
               <div className="input-group">
                 <label>Event Overview</label>
@@ -195,8 +252,8 @@ const EventPlanning = () => {
               </div>
             </div>
 
-            {/* Step 5: Assign Coordinator */}
-            <div className={`step-section ${currentStep === 5 ? 'active-section' : ''}`}>
+            {/* Step 6: Assign Coordinator */}
+            <div className={`step-section ${currentStep === 6 ? 'active-section' : ''}`}>
               <h2>Assign Coordinator</h2>
               <div className="input-group">
                 <label>Full Name</label>

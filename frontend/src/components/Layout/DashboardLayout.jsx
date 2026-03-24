@@ -82,7 +82,7 @@ const DashboardLayout = () => {
     
     // Management (Admin & Lead)
     { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays, roles: ['lead', 'event-lead'] },
-    { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
+    { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare, roles: ['admin', 'lead', 'event-lead'] },
     { path: '/dashboard/participants', label: 'Participant Registration', icon: Users, roles: ['admin', 'lead', 'event-lead'] },
     
     // Tracking (Admin & Lead)
