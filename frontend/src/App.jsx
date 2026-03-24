@@ -14,6 +14,7 @@ import EventSchedule from './components/EventSchedule/EventSchedule';
 import ExecutionTracking from './components/ExecutionTracking/ExecutionTracking';
 import Report from './components/Report/Report';
 import AlertNotification from './components/AlertNotification/AlertNotification';
+import EventCommunityChat from './components/EventCommunityChat/EventCommunityChat';
 import './App.css';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="tracking" element={<ExecutionTracking />} />
           <Route path="reports" element={<Report />} />
           <Route path="alerts" element={<AlertNotification />} />
+          <Route path="community" element={<EventCommunityChat />} />
         </Route>
 
 

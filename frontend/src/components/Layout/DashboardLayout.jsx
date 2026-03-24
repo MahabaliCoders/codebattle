@@ -12,7 +12,8 @@ import {
   LayoutDashboard,
   Calendar,
   Search,
-  BookOpen
+  BookOpen,
+  MessageSquare
 } from 'lucide-react';
 import { auth, db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -85,6 +86,9 @@ const DashboardLayout = () => {
     // Reporting (Admin & Lead)
     { path: '/dashboard/reports', label: 'Reports', icon: FileText, roles: ['admin'] },
     { path: '/dashboard/alerts', label: 'Alerts & Notifications', icon: Bell, roles: ['admin', 'lead', 'event-lead'] },
+    
+    // Community
+    { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
   ];
 
 
