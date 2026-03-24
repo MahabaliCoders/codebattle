@@ -1,5 +1,15 @@
 import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  CalendarDays,
+  CheckSquare,
+  Users,
+  Clock,
+  Activity,
+  FileText,
+  Bell,
+  LogOut
+} from 'lucide-react';
 import './DashboardLayout.css';
 
 const DashboardLayout = () => {
@@ -7,13 +17,13 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { path: '/dashboard/planning', label: 'Event Planning' },
-    { path: '/dashboard/tasks', label: 'Task Assignment' },
-    { path: '/dashboard/participants', label: 'Participant Registration' },
-    { path: '/dashboard/schedule', label: 'Event Schedule' },
-    { path: '/dashboard/tracking', label: 'Execution Tracking' },
-    { path: '/dashboard/reports', label: 'Reports' },
-    { path: '/dashboard/alerts', label: 'Alerts & Notifications' },
+    { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays },
+    { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare },
+    { path: '/dashboard/participants', label: 'Participant Registration', icon: Users },
+    { path: '/dashboard/schedule', label: 'Event Schedule', icon: Clock },
+    { path: '/dashboard/tracking', label: 'Execution Tracking', icon: Activity },
+    { path: '/dashboard/reports', label: 'Reports', icon: FileText },
+    { path: '/dashboard/alerts', label: 'Alerts & Notifications', icon: Bell },
   ];
 
   const handleLogout = () => {
@@ -24,39 +34,44 @@ const DashboardLayout = () => {
     <div className="dashboard-layout">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h2>Event Manager</h2>
+          <h2>EM</h2>
         </div>
         <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <Link 
-              key={item.path} 
-              to={item.path} 
-              className={`nav-link ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname.startsWith(item.path);
+            return (
+              <Link 
+                key={item.path} 
+                to={item.path} 
+                className={`nav-link ${isActive ? 'active' : ''}`}
+                title={item.label}
+              >
+                <Icon size={20} className="nav-icon" />
+                <span className="nav-label">{item.label}</span>
+              </Link>
+            )
+          })}
         </nav>
         <div className="sidebar-footer">
-          <button className="logout-btn" onClick={handleLogout}>
-            Sign Out
+          <button className="logout-btn" onClick={handleLogout} title="Sign Out">
+            <LogOut size={20} className="nav-icon" />
+            <span className="nav-label">Sign Out</span>
           </button>
         </div>
       </aside>
       
       <main className="main-content">
-        <header className="top-header">
-          <h2>College Event Management System</h2>
+        <header className="top-header glass-header">
+          <h2>College Event Management</h2>
           <div className="user-profile">
-            <span>Admin User</span>
+            <span>Admin</span>
             <div className="avatar">A</div>
           </div>
         </header>
         
-        <div className="page-content">
-          <div className="page-card">
-            <Outlet />
-          </div>
+        <div className="page-wrapper">
+          <Outlet />
         </div>
       </main>
     </div>
