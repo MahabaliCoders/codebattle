@@ -1,0 +1,131 @@
+.member-task-board {
+  padding: 24px;
+  background: #111; /* Mobile-first dark theme */
+  min-height: 100vh;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+}
+
+.board-header-pwa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.board-header-pwa h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.task-pill {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.task-list-pwa {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pwa-task-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.pwa-task-card .task-card-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.priority-indicator {
+  width: 4px;
+  height: 40px;
+  border-radius: 2px;
+  background: #6b7280; /* Low */
+}
+
+.priority-indicator[data-priority="high"] { background: #ef4444; }
+.priority-indicator[data-priority="medium"] { background: #f59e0b; }
+
+.task-text h4 {
+  font-size: 1.05rem;
+  margin: 0;
+  color: #f3f4f6;
+}
+
+.task-text p {
+  font-size: 0.8rem;
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pwa-complete-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.2s active;
+}
+
+.pwa-complete-btn:active {
+  transform: scale(0.95);
+}
+
+.pwa-task-card.completed {
+  opacity: 0.6;
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.completed-badge {
+  color: #10b981;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.empty-tasks {
+  text-align: center;
+  margin-top: 50px;
+  color: #4b5563;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.pwa-loading {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 0.95rem;
+}

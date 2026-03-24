@@ -1,7 +1,11 @@
-import { Plus, Calendar, User as UserIcon, X, Brain } from 'lucide-react';
+import { Plus, Calendar, User as UserIcon, X, Brain, RefreshCcw } from 'lucide-react';
+import { io } from 'socket.io-client';
 import { calculateAvailabilityScores } from '../../utils/taskBalancer';
 import SmartAssignDropdown from './SmartAssignDropdown';
 import './TaskAssignment.css';
+
+// 1. Establish Socket Connection to Sync Server
+const socket = io('http://localhost:5001');
 
 const mockWorkers = [
   { id: 'w1', name: 'Alice Member' },
@@ -29,6 +33,22 @@ const TaskAssignment = () => {
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', assigneeId: '', assigneeName: '', deadline: '', priority: 'medium' });
+
+  // 2. Deliverable 3: Real-Time Sync Listener (Socket.io)
+  useEffect(() => {
+    socket.on('task_status_updated', (updatedTask) => {
+      console.log('⚡ REAL-TIME SYNC: Task status changed', updatedTask);
+      
+      setTasks(prevTasks => prevTasks.map(t => 
+        t.id === updatedTask.id ? { ...t, status: updatedTask.status.toLowerCase() } : t
+      ));
+
+      // Optional: Visual toast notification for the Lead
+      alert(`Worker Task Updated: ${updatedTask.title} is now ${updatedTask.status}`);
+    });
+
+    return () => socket.off('task_status_updated');
+  }, []);
 
   const workersWithScores = calculateAvailabilityScores(mockWorkers, tasks, { 
     startTime: null, // Could be linked to a time picker in future

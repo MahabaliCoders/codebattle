@@ -72,7 +72,7 @@ const DashboardLayout = () => {
     // Shared / Admin
     { path: '/dashboard/admin', label: 'Admin Dashboard', icon: LayoutDashboard, roles: ['admin'] },
     { path: '/dashboard/lead', label: 'Lead Dashboard', icon: LayoutDashboard, roles: ['lead', 'event-lead'] },
-    { path: '/dashboard/user', label: 'My Dashboard', icon: LayoutDashboard, roles: ['user', 'participant'] },
+    { path: '/dashboard/user', label: 'My Dashboard', icon: LayoutDashboard, roles: ['user', 'participant', 'member'] },
     
     // Management (Admin & Lead)
     { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays, roles: ['admin', 'lead', 'event-lead'] },
@@ -88,7 +88,7 @@ const DashboardLayout = () => {
     { path: '/dashboard/alerts', label: 'Alerts & Notifications', icon: Bell, roles: ['admin', 'lead', 'event-lead'] },
     
     // Community
-    { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
+    { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant', 'member'] },
   ];
 
 
@@ -112,6 +112,7 @@ const DashboardLayout = () => {
     const role = userRole || 'user';
     if (role === 'admin') return { label: 'Admin', color: '#ef4444' };
     if (role === 'lead' || role === 'event-lead') return { label: 'Lead', color: '#f59e0b' };
+    if (role === 'member') return { label: 'Member', color: '#3b82f6' };
     return { label: 'Participant', color: '#10b981' };
   };
 

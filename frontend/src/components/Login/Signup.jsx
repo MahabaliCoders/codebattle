@@ -82,6 +82,7 @@ const Signup = () => {
               >
                 <option value="" disabled>Select Account Type</option>
                 <option value="User">Participant (User)</option>
+                <option value="Member">Team Member (Volunteer)</option>
                 <option value="Event Lead">Student Coordinator (Event Lead)</option>
                 <option value="Admin">Faculty/Superuser (Admin)</option>
               </select>

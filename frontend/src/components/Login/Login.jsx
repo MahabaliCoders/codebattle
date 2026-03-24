@@ -39,8 +39,9 @@ const Login = () => {
         // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
         
         if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/planning');
-        if (role === 'User') navigate('/dashboard/user');
+        else if (role === 'Event Lead') navigate('/dashboard/lead');
+        else if (role === 'Member') navigate('/dashboard/user'); // Members use user-style dashboard but with special tabs
+        else navigate('/dashboard/user');
       } else {
         setError('User profile not found. Please contact an admin.');
       }
@@ -54,7 +55,7 @@ const Login = () => {
         sessionStorage.setItem('mockUserRole', role.toLowerCase());
         
         if (role === 'Admin') navigate('/dashboard/admin');
-        else if (role === 'Event Lead') navigate('/dashboard/planning');
+        else if (role === 'Event Lead') navigate('/dashboard/lead');
         else navigate('/dashboard/user');
       } else {
         setError('Invalid email or password.');
@@ -90,7 +91,8 @@ const Login = () => {
                  <option value="" disabled>Select Role</option>
                  <option value="Admin">Admin</option>
                  <option value="Event Lead">Event Lead</option>
-                 <option value="User">User</option>
+                 <option value="Member">Member (Worker)</option>
+                 <option value="User">User (Participant)</option>
                </select>
             </div>
           </div>
