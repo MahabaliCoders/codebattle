@@ -1,5 +1,7 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login/Login';
+import DashboardLayout from './components/Layout/DashboardLayout';
 import EventPlanning from './components/EventPlanning/EventPlanning';
 import TaskAssignment from './components/TaskAssignment/TaskAssignment';
 import ParticipantRegistration from './components/ParticipantRegistration/ParticipantRegistration';
@@ -11,21 +13,24 @@ import './App.css';
 
 function App() {
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>College Event Management System</h1>
-      </header>
-      <main className="modules-grid">
-        <Login />
-        <EventPlanning />
-        <TaskAssignment />
-        <ParticipantRegistration />
-        <EventSchedule />
-        <ExecutionTracking />
-        <Report />
-        <AlertNotification />
-      </main>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/dashboard/planning" replace />} />
+          <Route path="planning" element={<EventPlanning />} />
+          <Route path="tasks" element={<TaskAssignment />} />
+          <Route path="participants" element={<ParticipantRegistration />} />
+          <Route path="schedule" element={<EventSchedule />} />
+          <Route path="tracking" element={<ExecutionTracking />} />
+          <Route path="reports" element={<Report />} />
+          <Route path="alerts" element={<AlertNotification />} />
+        </Route>
+        
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

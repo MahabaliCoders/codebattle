@@ -2,9 +2,13 @@ import React from 'react';
 
 const EventSchedule = () => {
   return (
-    <div className="module-container">
-      <h2>Module 5 - Event Schedule Module</h2>
-      <p>Placeholder for Event Schedule functionality.</p>
+    <div className="page-wrapper">
+      <div className="page-header">
+        <h1>Event Schedule</h1>
+      </div>
+      <div className="page-body">
+        <p>This is the newly separated <strong>Event Schedule</strong> page.</p>
+      </div>
     </div>
   );
 };
