@@ -8,6 +8,7 @@ import './Login.css';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('');
@@ -37,16 +38,23 @@ const Signup = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      const normalizedRole = role.toLowerCase().replace(/ /g, '-');
+      
       // Create user profile with role in Firestore
       await setDoc(doc(db, 'users', user.uid), {
+        name: fullName,
         email: user.email,
-        role: role.toLowerCase().replace(/ /g, '-'),
+        role: normalizedRole,
         createdAt: new Date().toISOString()
       });
 
+      // Cache for DashboardLayout to avoid rendering lag
+      localStorage.setItem('userRole', normalizedRole); 
+
       // Navigate to the appropriate dashboard based on role
-      const rolePath = role === 'Admin' ? 'admin' : (role === 'Event Lead' ? 'lead' : 'user');
-      navigate(`/dashboard/${rolePath}`);
+      if (normalizedRole === 'admin') navigate('/dashboard/admin');
+      else if (normalizedRole === 'event-lead') navigate('/dashboard/event-lead');
+      else navigate('/dashboard/user');
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.message || 'Error signing up');
@@ -85,6 +93,20 @@ const Signup = () => {
                 <option value="Event Lead">Student Coordinator (Event Lead)</option>
                 <option value="Admin">Faculty/Superuser (Admin)</option>
               </select>
+            </div>
+          </div>
+
+          <div className="input-group">
+            <div className="input-icon-wrapper">
+              <UserCircle className="input-icon" size={18} />
+              <input 
+                type="text" 
+                className="apple-input"
+                placeholder="Full Name" 
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required 
+              />
             </div>
           </div>
 

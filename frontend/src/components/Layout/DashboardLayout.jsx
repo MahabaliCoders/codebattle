@@ -21,7 +21,7 @@ import './DashboardLayout.css';
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,21 +34,20 @@ const DashboardLayout = () => {
           if (docSnap.exists()) {
             const role = docSnap.data().role?.toLowerCase();
             setUserRole(role);
+            localStorage.setItem('userRole', role);
           } else {
-            // Check if user is the first user/admin or has a specific email
-            if (user.email?.includes('admin')) setUserRole('admin');
-            else setUserRole('user');
+            const fallbackRole = user.email?.includes('admin') ? 'admin' : 'user';
+            setUserRole(fallbackRole);
+            localStorage.setItem('userRole', fallbackRole);
           }
         } catch (error) {
           console.error("Error fetching role:", error);
-          // Fallback if firestore fails
-          if (user.email?.includes('admin')) setUserRole('admin');
-          else setUserRole('user');
+          const fallbackRole = user.email?.includes('admin') ? 'admin' : 'user';
+          setUserRole(fallbackRole);
         }
         setLoading(false);
       } else {
-        // ONLY redirect if we are sure there's no user AFTER initial load
-        // AND check if we are in mock session for UI previewing
+        localStorage.removeItem('userRole');
         const isMock = sessionStorage.getItem('isMockLoggedIn') === 'true';
         if (isMock) {
           const mockRole = sessionStorage.getItem('mockUserRole') || 'admin';
@@ -74,8 +73,8 @@ const DashboardLayout = () => {
     { path: '/dashboard/user', label: 'My Dashboard', icon: LayoutDashboard, roles: ['user', 'participant'] },
     
     // Management (Admin & Lead)
-    { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays, roles: ['admin', 'lead', 'event-lead'] },
-    { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare, roles: ['admin', 'lead', 'event-lead'] },
+    { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays, roles: ['lead', 'event-lead'] },
+    { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
     { path: '/dashboard/participants', label: 'Participant Registration', icon: Users, roles: ['admin', 'lead', 'event-lead'] },
     
     // Tracking (Admin & Lead)
@@ -98,6 +97,7 @@ const DashboardLayout = () => {
 
   const handleLogout = () => {
     auth.signOut();
+    localStorage.removeItem('userRole');
     sessionStorage.removeItem('isMockLoggedIn');
     sessionStorage.removeItem('mockUserRole');
     navigate('/');

@@ -35,12 +35,12 @@ const Login = () => {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        // Option to verify if selected role matches:
-        // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
+        const detectedRole = userData.role || role.toLowerCase().replace(' ', '-');
+        localStorage.setItem('userRole', detectedRole); // Cache for DashboardLayout
         
-        if (role === 'Admin') navigate('/dashboard/admin');
-        if (role === 'Event Lead') navigate('/dashboard/planning');
-        if (role === 'User') navigate('/dashboard/user');
+        if (detectedRole === 'admin') navigate('/dashboard/admin');
+        else if (detectedRole === 'event-lead') navigate('/dashboard/event-lead');
+        else navigate('/dashboard/user');
       } else {
         setError('User profile not found. Please contact an admin.');
       }
@@ -49,12 +49,13 @@ const Login = () => {
       // Fallback fallback if firebase isn't active but user wants to test UI design behavior natively:
       if (err.code === 'auth/invalid-api-key' || !auth.apiKey || auth.apiKey.includes('AIzaSy')) {
         console.warn('Firebase unavailable, simulating login routing for UI preview.');
-        // Set mock auth state for testing if real firebase fails
+        const mockRole = role.toLowerCase().replace(' ', '-');
+        localStorage.setItem('userRole', mockRole); // Cache for DashboardLayout
         sessionStorage.setItem('isMockLoggedIn', 'true');
-        sessionStorage.setItem('mockUserRole', role.toLowerCase());
+        sessionStorage.setItem('mockUserRole', mockRole);
         
-        if (role === 'Admin') navigate('/dashboard/admin');
-        else if (role === 'Event Lead') navigate('/dashboard/planning');
+        if (mockRole === 'admin') navigate('/dashboard/admin');
+        else if (mockRole === 'event-lead') navigate('/dashboard/event-lead');
         else navigate('/dashboard/user');
       } else {
         setError('Invalid email or password.');

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { db, auth } from '../../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './EventPlanning.css';
-import { Calendar, MapPin, AlignLeft, User, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, AlignLeft, User, CheckCircle, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const steps = [
   { id: 1, title: 'Event Details', icon: CheckCircle },
@@ -12,6 +15,7 @@ const steps = [
 
 const EventPlanning = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     eventName: '',
     eventType: '',
@@ -19,28 +23,55 @@ const EventPlanning = () => {
     time: '',
     venue: '',
     description: '',
-    coordinator: ''
+    coordinatorName: '',
+    coordinatorPhone: ''
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Validation for phone number
+    if (currentStep === 5) {
+      if (!formData.coordinatorName.trim()) {
+        toast.error("Please enter coordinator name");
+        return;
+      }
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(formData.coordinatorPhone)) {
+        toast.error("Please enter a valid 10-digit phone number");
+        return;
+      }
+    }
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     } else {
-      const newEvent = { ...formData, id: `EVT-${Date.now()}` };
-      const existingEvents = JSON.parse(localStorage.getItem('eventsDirectory') || '[]');
-      localStorage.setItem('eventsDirectory', JSON.stringify([newEvent, ...existingEvents]));
-      
-      console.log('Event Created!', newEvent);
-      alert('Event Created Successfully!');
-      
-      setFormData({
-        eventName: '', eventType: '', date: '', time: '', venue: '', description: '', coordinator: ''
-      });
-      setCurrentStep(1);
+      setIsLoading(true);
+      try {
+        const eventData = {
+          ...formData,
+          createdAt: serverTimestamp(),
+          createdBy: auth.currentUser?.uid || 'anonymous-user',
+          creatorEmail: auth.currentUser?.email || 'not-provided@example.com',
+          status: 'upcoming'
+        };
+        
+        await addDoc(collection(db, 'events'), eventData);
+        
+        toast.success('Event Created Successfully in Cloud!');
+        
+        setFormData({
+          eventName: '', eventType: '', date: '', time: '', venue: '', description: '', coordinatorName: '', coordinatorPhone: ''
+        });
+        setCurrentStep(1);
+      } catch (error) {
+        console.error("Error creating event:", error);
+        toast.error("Failed to store event: " + error.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -168,13 +199,29 @@ const EventPlanning = () => {
             <div className={`step-section ${currentStep === 5 ? 'active-section' : ''}`}>
               <h2>Assign Coordinator</h2>
               <div className="input-group">
-                <label>Coordinator</label>
-                <select name="coordinator" value={formData.coordinator} onChange={handleChange} className="modern-input">
-                  <option value="">Select Faculty/Student Coordinator</option>
-                  <option value="prof_smith">Prof. Smith (CS Dept)</option>
-                  <option value="dr_jones">Dr. Jones (Arts Dept)</option>
-                  <option value="student_council">Student Council President</option>
-                </select>
+                <label>Full Name</label>
+                <input 
+                  type="text" 
+                  name="coordinatorName"
+                  placeholder="E.g. Dr. John Doe" 
+                  value={formData.coordinatorName}
+                  onChange={handleChange}
+                  className="modern-input"
+                  required
+                />
+              </div>
+              <div className="input-group">
+                <label>Phone Number (10 digits)</label>
+                <input 
+                  type="tel" 
+                  name="coordinatorPhone"
+                  placeholder="E.g. 9876543210" 
+                  value={formData.coordinatorPhone}
+                  onChange={handleChange}
+                  className="modern-input"
+                  maxLength="10"
+                  required
+                />
               </div>
             </div>
 
@@ -185,8 +232,9 @@ const EventPlanning = () => {
         <div className="form-actions">
           <button 
             type="button" 
-            className={`btn-secondary ${currentStep === 1 ? 'hidden' : ''}`}
+            className={`btn-secondary ${currentStep === 1 || isLoading ? 'hidden' : ''}`}
             onClick={handlePrev}
+            disabled={isLoading}
           >
             Back
           </button>
@@ -195,8 +243,9 @@ const EventPlanning = () => {
             type="button" 
             className="btn-primary"
             onClick={handleNext}
+            disabled={isLoading}
           >
-            {isLastStep ? 'Create Event' : 'Next Step'}
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : (isLastStep ? 'Create Event' : 'Next Step')}
           </button>
         </div>
 
@@ -204,5 +253,4 @@ const EventPlanning = () => {
     </div>
   );
 };
-
 export default EventPlanning;
