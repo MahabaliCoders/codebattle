@@ -14,6 +14,9 @@ import EventSchedule from './components/EventSchedule/EventSchedule';
 import ExecutionTracking from './components/ExecutionTracking/ExecutionTracking';
 import Report from './components/Report/Report';
 import AlertNotification from './components/AlertNotification/AlertNotification';
+import PosterStudio from './components/PosterStudio/PosterStudio';
+import EventCommunityChat from './components/EventCommunityChat/EventCommunityChat';
+import MyTickets from './components/Dashboards/MyTickets';
 import './App.css';
 
 function App() {
@@ -31,6 +34,7 @@ function App() {
             <Route path="admin" element={<AdminDashboard />} />
             <Route path="event-lead" element={<EventLeadDashboard />} />
             <Route path="user" element={<UserDashboard />} />
+            <Route path="my-tickets" element={<MyTickets />} />
             <Route path="planning" element={<EventPlanning />} />
             <Route path="tasks" element={<TaskAssignment />} />
             <Route path="participants" element={<ParticipantRegistration />} />
@@ -38,6 +42,8 @@ function App() {
             <Route path="tracking" element={<ExecutionTracking />} />
             <Route path="reports" element={<Report />} />
             <Route path="alerts" element={<AlertNotification />} />
+            <Route path="posters" element={<PosterStudio />} />
+            <Route path="community" element={<EventCommunityChat />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text as KonvaText, Transformer, Image as KonvaImage, Circle } from 'react-konva';
+import { db } from '../../firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import useImage from 'use-image';
 import { 
   LayoutTemplate, Image as ImageIcon, Type, Sparkles, Upload, Wrench, 
   FolderPlus, Grid3X3, Copy, PlusSquare, ZoomIn, ZoomOut, StickyNote, Activity,
-  ChevronLeft, AlignLeft, SendToBack, BringToFront, Trash2, Download, Bold, Palette, LayoutGrid, Star, Sparkle
+  ChevronLeft, AlignLeft, SendToBack, BringToFront, Trash2, Download, Bold, Palette, LayoutGrid, Star, Sparkle, FileText
 } from 'lucide-react';
 import './PosterStudio.css';
 
@@ -243,6 +245,14 @@ const PosterStudio = () => {
   const [editingTextId, setEditingTextId] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [textInputPos, setTextInputPos] = useState({ x: 0, y: 0, width: 100, height: 30 });
+  const [liveEvents, setLiveEvents] = useState([]);
+  
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'events'), (snap) => {
+      setLiveEvents(snap.docs.map(doc => doc.data()));
+    });
+    return unsub;
+  }, []);
   
   const stageRefs = useRef({});
   const fileInputRef = useRef(null);
@@ -367,8 +377,7 @@ const PosterStudio = () => {
 
   // Smart Templating System (AUTO-FILL DATA)
   const loadTemplate = (template) => {
-    const dir = JSON.parse(localStorage.getItem('eventsDirectory') || '[]');
-    const evt = dir.length > 0 ? dir[0] : { eventName: 'Sample Event 2026', date: 'Date TBA', venue: 'Venue TBA' };
+    const evt = liveEvents.length > 0 ? liveEvents[liveEvents.length - 1] : { eventName: 'Sample Event', date: 'TBA', venue: 'TBA' };
 
     const newAnns = template.annotations.map(a => {
       let mergedData = { ...a, id: a.id + Date.now() };
@@ -436,6 +445,18 @@ const PosterStudio = () => {
       const link = document.createElement('a');
       link.download = `PremiumPoster_${Date.now()}.png`; link.href = uri;
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+  };
+
+  const savePosterPDF = () => {
+    const stage = stageRefs.current[pages[0].id];
+    if (stage) {
+      import('jspdf').then(({ jsPDF }) => {
+        const uri = stage.toDataURL({ pixelRatio: 2 });
+        const pdf = new jsPDF('l', 'px', [800, 600]);
+        pdf.addImage(uri, 'PNG', 0, 0, 800, 600);
+        pdf.save(`Poster_HD_${Date.now()}.pdf`);
+      });
     }
   };
 
@@ -618,8 +639,9 @@ const PosterStudio = () => {
             <div className="export-actions">
               <button className="apple-secondary-btn" onClick={() => loadTemplate(filteredTemplates[0])}><LayoutGrid size={16}/> Shuffle Layout</button>
               <div className="divider" style={{height: 18, alignSelf: 'center'}} />
-              <button className="apple-secondary-btn" onClick={savePosterJSON}><FolderPlus size={16}/> Save JSON</button>
-              <button className="apple-primary-btn" onClick={savePosterPNG}><Download size={16}/> Export PNG</button>
+              <button className="apple-secondary-btn" onClick={savePosterJSON}><FolderPlus size={16}/> Save Project</button>
+              <button className="apple-secondary-btn" onClick={savePosterPNG}><Download size={16}/> PNG</button>
+              <button className="apple-primary-btn" onClick={savePosterPDF}><FileText size={16}/> PDF</button>
             </div>
          </div>
 

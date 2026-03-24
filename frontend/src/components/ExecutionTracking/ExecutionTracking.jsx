@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, PlayCircle, Loader, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, PlayCircle, Loader, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react';
+import { db } from '../../firebase';
+import { collection, onSnapshot, query, orderBy, updateDoc, doc } from 'firebase/firestore';
 import './ExecutionTracking.css';
-
-const initialTasks = [
-  { id: 1, title: 'Main Stage Setup', status: 'Ongoing', progress: 65, category: 'Logistics' },
-  { id: 2, title: 'Registration Desk', status: 'Ongoing', progress: 32, category: 'Admin' },
-  { id: 3, title: 'Catering Arrival', status: 'Pending', progress: 0, category: 'Food' },
-  { id: 4, title: 'AV System Check', status: 'Completed', progress: 100, category: 'Tech' },
-  { id: 5, title: 'Guest Speaker Prep', status: 'Ongoing', progress: 85, category: 'Programming' },
-  { id: 6, title: 'Goodie Bags Packing', status: 'Pending', progress: 0, category: 'Logistics' },
-];
 
 const CircularProgress = ({ progress, status }) => {
   const radius = 28;
@@ -17,8 +10,8 @@ const CircularProgress = ({ progress, status }) => {
   const strokeDashoffset = circumference - (progress / 100) * circumference;
   
   let color = '#0071e3'; // Ongoing (Blue)
-  if (status === 'Completed') color = '#34c759'; // Green
-  if (status === 'Pending') color = '#ff9f0a'; // Orange
+  if (status === 'done') color = '#34c759'; // Green
+  if (status === 'todo') color = '#ff9f0a'; // Orange
   
   return (
     <div className="circular-progress-wrapper">
@@ -47,106 +40,129 @@ const CircularProgress = ({ progress, status }) => {
 };
 
 const ExecutionTracking = () => {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [isSimulating, setIsSimulating] = useState(true);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Simulate real-time progress to create a "Live" feel
   useEffect(() => {
-    if (!isSimulating) return;
-
-    const interval = setInterval(() => {
-      setTasks(prevTasks => prevTasks.map(task => {
-        // Randomly grab one pending task if there's no ongoing to make it start
-        if (task.status === 'Pending' && Math.random() > 0.8) {
-           return { ...task, progress: 2, status: 'Ongoing' };
-        }
-        
-        if (task.status === 'Ongoing' && task.progress < 100) {
-          const increment = Math.random() * 8 + 2; // Random burst of 2 to 10 points
-          const newProgress = Math.min(task.progress + increment, 100);
-          return {
-            ...task,
-            progress: newProgress,
-            status: newProgress === 100 ? 'Completed' : 'Ongoing'
-          };
-        }
-        return task;
+    const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const taskList = snapshot.docs.map(d => ({
+        id: d.id,
+        progress: d.data().progress || 0,
+        ...d.data()
       }));
-    }, 2500);
+      setTasks(taskList);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [isSimulating]);
+  const handleUpdateProgress = async (taskId, currentProgress, increment) => {
+    const newProgress = Math.min(Math.max(currentProgress + increment, 0), 100);
+    const status = newProgress === 100 ? 'done' : (newProgress === 0 ? 'todo' : 'inProgress');
+    
+    try {
+      await updateDoc(doc(db, 'tasks', taskId), {
+        progress: newProgress,
+        status: status
+      });
+    } catch (err) {
+      console.error("Error updating task progress:", err);
+    }
+  };
 
-  const overallProgress = tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length;
+  const getOverallProgress = () => {
+    if (tasks.length === 0) return 0;
+    const totalProgress = tasks.reduce((sum, t) => sum + (t.progress || 0), 0);
+    return Math.round(totalProgress / tasks.length);
+  };
 
   const renderStatusIcon = (status) => {
     switch (status) {
-      case 'Pending': return <PlayCircle size={14} />;
-      case 'Ongoing': return <Loader size={14} className="spin-icon" />;
-      case 'Completed': return <CheckCircle2 size={14} />;
+      case 'todo': return <PlayCircle size={14} />;
+      case 'inProgress': return <Loader size={14} className="spin-icon" />;
+      case 'done': return <CheckCircle2 size={14} />;
       default: return null;
     }
   };
 
+  const statusMap = {
+    'todo': 'Pending',
+    'inProgress': 'Ongoing',
+    'done': 'Completed'
+  };
+
+  if (loading) return <div className="loading-state">Syncing live operations...</div>;
+
   return (
-    <div className="execution-container">
+    <div className="execution-container fade-in">
       <div className="execution-header">
         <div className="header-text">
           <h1>Execution Tracking</h1>
-          <p>Real-time progress monitoring for today's event operations.</p>
+          <p>Real-time progress monitoring matched with live Firestore data.</p>
         </div>
-        <button 
-          className={`btn-simulate ${isSimulating ? 'active' : ''}`} 
-          onClick={() => setIsSimulating(!isSimulating)}
-        >
-          <RefreshCw size={16} className={isSimulating ? 'spin-icon' : ''} />
-          {isSimulating ? 'Live Syncing' : 'Paused Sync'}
-        </button>
+        <div className="live-badge">
+           <span className="live-dot"></span> Live Sync Active
+        </div>
       </div>
 
-      {/* Global Progress */}
       <div className="global-progress-card">
         <div className="global-progress-info">
-          <h2>Overall Progress</h2>
-          <span className="global-percentage">{Math.round(overallProgress)}%</span>
+          <h2>Overall Completion</h2>
+          <span className="global-percentage">{getOverallProgress()}%</span>
         </div>
         <div className="linear-progress-container">
           <div 
             className="linear-progress-bar global-bar" 
-            style={{ width: `${overallProgress}%` }}
+            style={{ width: `${getOverallProgress()}%` }}
           ></div>
         </div>
       </div>
 
-      <div className="tracking-grid">
-        {tasks.map(task => (
-          <div key={task.id} className="task-tracking-card">
-            <div className="card-top">
-              <span className={`status-chip chip-${task.status.toLowerCase()}`}>
-                {renderStatusIcon(task.status)}
-                {task.status}
-              </span>
-              <span className="task-category">{task.category}</span>
-            </div>
-            
-            <div className="card-middle">
-              <CircularProgress progress={task.progress} status={task.status} />
-              <h3 className="task-title">{task.title}</h3>
-            </div>
-            
-            <div className="card-bottom">
-              <div className="linear-progress-wrapper">
-                <div className="linear-progress-bg">
-                  <div 
-                    className={`linear-progress-fill fill-${task.status.toLowerCase()}`}
-                    style={{ width: `${task.progress}%` }}
-                  ></div>
-                </div>
+      {tasks.length === 0 ? (
+        <div className="empty-tracking">
+          <p>No tasks found. Add tasks in the Task Board to track them here.</p>
+        </div>
+      ) : (
+        <div className="tracking-grid">
+          {tasks.map(task => (
+            <div key={task.id} className="task-tracking-card project-card">
+              <div className="card-top">
+                <span className={`status-chip chip-${task.status}`}>
+                  {renderStatusIcon(task.status)}
+                  {statusMap[task.status] || 'Unknown'}
+                </span>
+                <span className="task-category">{task.priority?.toUpperCase()} PRIORITY</span>
+              </div>
+              
+              <div className="card-middle">
+                <CircularProgress progress={task.progress || 0} status={task.status} />
+                <h3 className="task-title">{task.title}</h3>
+              </div>
+              
+              <div className="card-bottom">
+                 <div className="progress-controls">
+                    <button onClick={() => handleUpdateProgress(task.id, task.progress || 0, -10)} disabled={(task.progress || 0) <= 0}>
+                       <ChevronDown size={18} />
+                    </button>
+                    <div className="linear-progress-wrapper" style={{flex: 1}}>
+                      <div className="linear-progress-bg">
+                        <div 
+                          className={`linear-progress-fill fill-${task.status}`}
+                          style={{ width: `${task.progress || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <button onClick={() => handleUpdateProgress(task.id, task.progress || 0, 10)} disabled={(task.progress || 0) >= 100}>
+                       <ChevronUp size={18} />
+                    </button>
+                 </div>
+                 <div className="assignee-text">Assignee: {task.assignee || 'Unassigned'}</div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

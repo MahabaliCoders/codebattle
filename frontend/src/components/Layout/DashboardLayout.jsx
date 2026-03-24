@@ -14,6 +14,7 @@ import {
   Search,
   BookOpen,
   Image as ImageIcon,
+  Ticket,
   MessageSquare
 } from 'lucide-react';
 import { auth, db } from '../../firebase';
@@ -24,6 +25,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole'));
+  const [userName, setUserName] = useState('NIT User');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,8 +36,10 @@ const DashboardLayout = () => {
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
-            const role = docSnap.data().role?.toLowerCase();
+            const data = docSnap.data();
+            const role = data.role?.toLowerCase();
             setUserRole(role);
+            setUserName(data.name || 'NIT User');
             localStorage.setItem('userRole', role);
           } else {
             const fallbackRole = user.email?.includes('admin') ? 'admin' : 'user';
@@ -54,6 +58,7 @@ const DashboardLayout = () => {
         if (isMock) {
           const mockRole = sessionStorage.getItem('mockUserRole') || 'admin';
           setUserRole(mockRole);
+          setUserName('Mock Admin');
           setLoading(false);
           return;
         }
@@ -71,8 +76,9 @@ const DashboardLayout = () => {
   const navItems = [
     // Shared / Admin
     { path: '/dashboard/admin', label: 'Admin Dashboard', icon: LayoutDashboard, roles: ['admin'] },
-    { path: '/dashboard/lead', label: 'Lead Dashboard', icon: LayoutDashboard, roles: ['lead', 'event-lead'] },
+    { path: '/dashboard/event-lead', label: 'Coordinator Portal', icon: LayoutDashboard, roles: ['lead', 'event-lead'] },
     { path: '/dashboard/user', label: 'My Dashboard', icon: LayoutDashboard, roles: ['user', 'participant'] },
+    { path: '/dashboard/my-tickets', label: 'My Tickets', icon: Ticket, roles: ['user', 'participant'] },
     
     // Management (Admin & Lead)
     { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays, roles: ['lead', 'event-lead'] },
@@ -126,8 +132,8 @@ const DashboardLayout = () => {
     <div className="dashboard-layout fade-in">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div className="logo-square">EM</div>
-          <span className="logo-text">EventMaster</span>
+          <div className="logo-square">NIT</div>
+          <span className="logo-text">CodeBattle</span>
         </div>
         
         <nav className="sidebar-nav">
@@ -164,12 +170,12 @@ const DashboardLayout = () => {
           <div className="header-right">
             <div className="user-profile">
               <div className="user-info">
-                <span className="user-name">{auth.currentUser?.email?.split('@')[0]}</span>
+                <span className="user-name">{userName}</span>
                 <span className="user-role-badge" style={{backgroundColor: getUserBadge().color}}>
                   {getUserBadge().label}
                 </span>
               </div>
-              <div className="avatar">{auth.currentUser?.email?.[0].toUpperCase() || 'U'}</div>
+              <div className="avatar">{userName[0].toUpperCase() || 'U'}</div>
             </div>
           </div>
         </header>
