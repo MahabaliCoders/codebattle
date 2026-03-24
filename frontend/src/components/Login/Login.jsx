@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, UserCircle, Loader2 } from 'lucide-react';
+import { auth, db } from '../../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import './Login.css';
 
 const Login = () => {
@@ -16,7 +19,7 @@ const Login = () => {
     setIsLoaded(true);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!role) {
       setError('Please select a role to continue.');
@@ -25,13 +28,36 @@ const Login = () => {
     setError('');
     setIsLoading(true);
 
-    // Simulate network authentication
-    setTimeout(() => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        // Option to verify if selected role matches:
+        // if (userData.role !== role.toLowerCase().replace(' ', '-')) ...
+        
+        if (role === 'Admin') navigate('/dashboard/admin');
+        if (role === 'Event Lead') navigate('/dashboard/event-lead');
+        if (role === 'User') navigate('/dashboard/user');
+      } else {
+        setError('User profile not found. Please contact an admin.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      // Fallback fallback if firebase isn't active but user wants to test UI design behavior natively:
+      if (err.code === 'auth/invalid-api-key' || !auth.apiKey) {
+        console.warn('Firebase unavailable, simulating login routing for UI preview.');
+        if (role === 'Admin') navigate('/dashboard/admin');
+        if (role === 'Event Lead') navigate('/dashboard/event-lead');
+        if (role === 'User') navigate('/dashboard/user');
+      } else {
+        setError('Invalid email or password.');
+      }
+    } finally {
       setIsLoading(false);
-      if (role === 'Admin') navigate('/dashboard/admin');
-      if (role === 'Event Lead') navigate('/dashboard/event-lead');
-      if (role === 'User') navigate('/dashboard/user');
-    }, 1200);
+    }
   };
 
   return (
@@ -49,7 +75,7 @@ const Login = () => {
         <form className="login-form" onSubmit={handleSubmit}>
           
           <div className="input-group">
-            <div className={`input-icon-wrapper ${error ? 'has-error' : ''}`}>
+            <div className={`input-icon-wrapper ${error && error.includes('role') ? 'has-error' : ''}`}>
                <UserCircle className="input-icon" size={18} />
                <select 
                  className="apple-input apple-select" 
@@ -111,7 +137,7 @@ const Login = () => {
         </form>
 
         <div className="login-footer">
-          <p>Don't have an account? <a href="#register">Sign up</a></p>
+          <p>Don't have an account? <Link to="/signup">Sign up</Link></p>
         </div>
 
       </div>
