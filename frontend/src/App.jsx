@@ -16,11 +16,15 @@ import EventSchedule from './components/EventSchedule/EventSchedule';
 import ExecutionTracking from './components/ExecutionTracking/ExecutionTracking';
 import Report from './components/Report/Report';
 import AlertNotification from './components/AlertNotification/AlertNotification';
+import FirebaseTester from './FirebaseTester';
 import './App.css';
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
+      <FirebaseTester />
+      <BrowserRouter>
+
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -48,8 +52,10 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 
 export default App;
+
 
