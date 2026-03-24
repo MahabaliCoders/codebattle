@@ -1,0 +1,221 @@
+/* f:\codebattle\codebattle\frontend\src\components\ExecutionTracking\ExecutionTracking.css */
+
+.execution-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  gap: 32px;
+}
+
+.execution-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.header-text h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.header-text p {
+  color: #86868b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.btn-simulate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #515154;
+  border: 1px solid #d2d2d7;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.btn-simulate.active {
+  background: rgba(0, 113, 227, 0.08);
+  color: #0071e3;
+  border-color: rgba(0, 113, 227, 0.2);
+}
+
+.spin-icon {
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Global Progress */
+.global-progress-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.global-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-progress-info h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+.global-percentage {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0071e3;
+}
+
+.linear-progress-container {
+  height: 8px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.global-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #2b8ff7, #0071e3);
+  border-radius: 6px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tracking Grid */
+.tracking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.task-tracking-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.01);
+}
+
+.task-tracking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Status Chips */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.4s ease;
+}
+
+.chip-pending { background: #fffbeb; color: #b45309; }
+.chip-ongoing { background: #f0f9ff; color: #0071e3; }
+.chip-completed { background: #f0fdf4; color: #15803d; }
+
+.task-category {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #86868b;
+  background: #f5f5f7;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+/* Card Middle */
+.card-middle {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.task-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  line-height: 1.3;
+}
+
+/* Circular Progress */
+.circular-progress-wrapper {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.progress-text {
+  position: absolute;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+/* Card Bottom */
+.linear-progress-wrapper {
+  width: 100%;
+}
+
+.linear-progress-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.linear-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.5s ease;
+}
+
+.fill-pending { background: #ff9f0a; }
+.fill-ongoing { background: #0071e3; }
+.fill-completed { background: #34c759; }

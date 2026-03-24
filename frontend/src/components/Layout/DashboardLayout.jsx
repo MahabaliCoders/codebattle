@@ -8,7 +8,8 @@ import {
   Activity,
   FileText,
   Bell,
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from 'lucide-react';
 import './DashboardLayout.css';
 
@@ -17,6 +18,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   const navItems = [
+    { path: '/dashboard/admin', label: 'Admin Dashboard', icon: LayoutDashboard },
     { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays },
     { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare },
     { path: '/dashboard/participants', label: 'Participant Registration', icon: Users },
