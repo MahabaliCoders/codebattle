@@ -16,7 +16,7 @@ const EventSchedule = () => {
         id: doc.id,
         ...doc.data()
       }));
-      
+
       // Secondary sort by time if dates are same
       eventList.sort((a, b) => {
         if (a.date === b.date) {
@@ -59,19 +59,19 @@ const EventSchedule = () => {
           <p>Live Timeline of Upcoming Activities</p>
         </div>
         <div className="schedule-actions">
-           <div className="live-status-pill">
-              <span className="live-dot"></span> Firestore Synchronized
-           </div>
+          <div className="live-status-pill">
+            <span className="live-dot"></span>  Synchronized
+          </div>
         </div>
       </div>
 
       <div className="timeline-wrapper">
         <div className="timeline-scroll-container" ref={timelineRef}>
           <div className="timeline-line"></div>
-          
+
           {events.length > 0 ? events.map((event, index) => (
-            <div 
-              key={event.id} 
+            <div
+              key={event.id}
               className={`timeline-block color-${['blue', 'purple', 'orange', 'green'][index % 4]}`}
               style={{ animationDelay: `${index * 0.15}s` }}
             >
@@ -94,7 +94,7 @@ const EventSchedule = () => {
               <p>Events added by coordinators will appear here on the master timeline.</p>
             </div>
           )}
-          
+
           <div className="timeline-spacer"></div>
         </div>
       </div>

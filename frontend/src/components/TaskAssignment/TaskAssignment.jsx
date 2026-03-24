@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Calendar, User as UserIcon, X } from 'lucide-react';
+import { Plus, Calendar, User as UserIcon, X, ChevronRight } from 'lucide-react';
 import { db } from '../../firebase';
 import { 
   collection, 
@@ -143,9 +143,12 @@ const TaskAssignment = () => {
                     className={`task-card-premium ${!canManage ? 'no-drag' : ''}`}
                   >
                     <div className="task-card-branding">
-                      <span className={`status-pill-mini status-${task.status}`}>
-                        {task.status === 'inProgress' ? 'Ongoing' : task.status === 'done' ? 'Completed' : 'Pending'}
-                      </span>
+                      <div className="status-flow-wrap">
+                        <span className={`status-pill-mini status-${task.status}`}>
+                          {task.status === 'inProgress' ? 'Ongoing' : task.status === 'done' ? 'Completed' : 'Pending'}
+                        </span>
+                        {task.status !== 'done' && <ChevronRight size={14} className="status-next-arrow" />}
+                      </div>
                       <span className={`priority-label-text p-${task.priority}`}>
                         {task.priority.toUpperCase()} PRIORITY
                       </span>

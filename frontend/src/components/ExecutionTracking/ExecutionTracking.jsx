@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, PlayCircle, Loader, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react';
+import { RefreshCw, PlayCircle, Loader, CheckCircle2, Minus, Plus } from 'lucide-react';
 import { db } from '../../firebase';
 import { collection, onSnapshot, query, orderBy, updateDoc, doc } from 'firebase/firestore';
 import './ExecutionTracking.css';
@@ -42,6 +42,9 @@ const CircularProgress = ({ progress, status }) => {
 const ExecutionTracking = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const userRole = localStorage.getItem('userRole')?.toLowerCase() || 'user';
+  const canEdit = ['lead', 'event-lead', 'event lead'].includes(userRole);
+  const isAdmin = userRole === 'admin';
 
   useEffect(() => {
     const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'));
@@ -58,6 +61,7 @@ const ExecutionTracking = () => {
   }, []);
 
   const handleUpdateProgress = async (taskId, currentProgress, increment) => {
+    if (!canEdit) return;
     const newProgress = Math.min(Math.max(currentProgress + increment, 0), 100);
     const status = newProgress === 100 ? 'done' : (newProgress === 0 ? 'todo' : 'inProgress');
     
@@ -99,10 +103,13 @@ const ExecutionTracking = () => {
       <div className="execution-header">
         <div className="header-text">
           <h1>Execution Tracking</h1>
-          <p>Real-time progress monitoring matched with live Firestore data.</p>
+          <p>{isAdmin ? 'Supervisory Oversight: Real-time progress monitoring (Read-only).' : 'Real-time progress monitoring matched with live Firestore data.'}</p>
         </div>
-        <div className="live-badge">
-           <span className="live-dot"></span> Live Sync Active
+        <div className="header-badges">
+          {isAdmin && <span className="admin-view-tag">Supervisory View</span>}
+          <div className="live-badge">
+             <span className="live-dot"></span> Live Sync Active
+          </div>
         </div>
       </div>
 
@@ -137,27 +144,36 @@ const ExecutionTracking = () => {
               
               <div className="card-middle">
                 <CircularProgress progress={task.progress || 0} status={task.status} />
-                <h3 className="task-title">{task.title}</h3>
+                <h3 className="task-title-execution">{task.title}</h3>
               </div>
               
-              <div className="card-bottom">
-                 <div className="progress-controls">
-                    <button onClick={() => handleUpdateProgress(task.id, task.progress || 0, -10)} disabled={(task.progress || 0) <= 0}>
-                       <ChevronDown size={18} />
-                    </button>
-                    <div className="linear-progress-wrapper" style={{flex: 1}}>
-                      <div className="linear-progress-bg">
+              <div className="card-bottom-premium">
+                 <div className="progress-controls-modern">
+                    {canEdit && (
+                      <div className="stepper-controls">
+                        <button className="stepper-btn" onClick={() => handleUpdateProgress(task.id, task.progress || 0, -10)} disabled={(task.progress || 0) <= 0}>
+                           <Minus size={16} />
+                        </button>
+                        <button className="stepper-btn" onClick={() => handleUpdateProgress(task.id, task.progress || 0, 10)} disabled={(task.progress || 0) >= 100}>
+                           <Plus size={16} />
+                        </button>
+                      </div>
+                    )}
+                    
+                    <div className="linear-progress-wrapper-premium" style={{flex: 1}}>
+                      <div className="linear-progress-bg-premium">
                         <div 
                           className={`linear-progress-fill fill-${task.status}`}
                           style={{ width: `${task.progress || 0}%` }}
                         ></div>
                       </div>
+                      <div className="linear-percentage-text">{task.progress || 0}%</div>
                     </div>
-                    <button onClick={() => handleUpdateProgress(task.id, task.progress || 0, 10)} disabled={(task.progress || 0) >= 100}>
-                       <ChevronUp size={18} />
-                    </button>
                  </div>
-                 <div className="assignee-text">Assignee: {task.assignee || 'Unassigned'}</div>
+                 <div className="assignee-footer-text">
+                   <div className="assignee-label">Assignee:</div>
+                   <div className="assignee-name-val">{task.assignee || 'nitu'}</div>
+                 </div>
               </div>
             </div>
           ))}

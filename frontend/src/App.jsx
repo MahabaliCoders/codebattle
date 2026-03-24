@@ -17,6 +17,7 @@ import AlertNotification from './components/AlertNotification/AlertNotification'
 import PosterStudio from './components/PosterStudio/PosterStudio';
 import EventCommunityChat from './components/EventCommunityChat/EventCommunityChat';
 import MyTickets from './components/Dashboards/MyTickets';
+import EventGallery from './components/EventGallery/EventGallery';
 import './App.css';
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
             <Route path="alerts" element={<AlertNotification />} />
             <Route path="posters" element={<PosterStudio />} />
             <Route path="community" element={<EventCommunityChat />} />
+            <Route path="gallery" element={<EventGallery />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

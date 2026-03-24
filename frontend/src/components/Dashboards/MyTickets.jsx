@@ -152,7 +152,6 @@ const MyTickets = () => {
                 includeMargin={true} 
                 className="qr-actual-canvas"
                />
-               <div className="scanning-line"></div>
             </div>
             
             <div className="modal-ticket-details">

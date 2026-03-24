@@ -34,7 +34,7 @@ const DashboardLayout = () => {
         try {
           const docRef = doc(db, 'users', user.uid);
           const docSnap = await getDoc(docRef);
-          
+
           if (docSnap.exists()) {
             const data = docSnap.data();
             const role = data.role?.toLowerCase();
@@ -68,7 +68,7 @@ const DashboardLayout = () => {
         navigate('/');
       }
     });
-    
+
     return () => unsubscribe();
   }, [navigate]);
 
@@ -76,26 +76,27 @@ const DashboardLayout = () => {
   const navItems = [
     // Shared / Admin
     { path: '/dashboard/admin', label: 'Admin Dashboard', icon: LayoutDashboard, roles: ['admin'] },
-    { path: '/dashboard/event-lead', label: 'Coordinator Portal', icon: LayoutDashboard, roles: ['lead', 'event-lead'] },
+    { path: '/dashboard/event-lead', label: 'Dashboard', icon: LayoutDashboard, roles: ['lead', 'event-lead'] },
     { path: '/dashboard/user', label: 'My Dashboard', icon: LayoutDashboard, roles: ['user', 'participant'] },
-    { path: '/dashboard/my-tickets', label: 'My Tickets', icon: Ticket, roles: ['user', 'participant'] },
-    
+    { path: '/dashboard/my-tickets', label: 'My Events', icon: Ticket, roles: ['user', 'participant'] },
+
     // Management (Admin & Lead)
     { path: '/dashboard/planning', label: 'Event Planning', icon: CalendarDays, roles: ['lead', 'event-lead'] },
-    { path: '/dashboard/tasks', label: 'Task Assignment', icon: CheckSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
+    { path: '/dashboard/tasks', label: 'Operational Tasks', icon: CheckSquare, roles: ['admin', 'lead', 'event-lead'] },
     { path: '/dashboard/participants', label: 'Participant Registration', icon: Users, roles: ['admin', 'lead', 'event-lead'] },
-    
+
     // Tracking (Admin & Lead)
     { path: '/dashboard/schedule', label: 'Event Schedule', icon: Clock, roles: ['admin', 'lead', 'event-lead'] },
     { path: '/dashboard/tracking', label: 'Execution Tracking', icon: Activity, roles: ['admin', 'lead', 'event-lead'] },
-    
+
     // Reporting (Admin & Lead)
     { path: '/dashboard/reports', label: 'Reports', icon: FileText, roles: ['admin'] },
     { path: '/dashboard/alerts', label: 'Alerts & Notifications', icon: Bell, roles: ['admin', 'lead', 'event-lead'] },
     { path: '/dashboard/posters', label: 'Poster Studio', icon: ImageIcon, roles: ['admin', 'lead', 'event-lead'] },
-    
-    // Community
+
+    // Community & Content
     { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
+    { path: '/dashboard/gallery', label: 'Mission Gallery', icon: ImageIcon, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
   ];
 
 
@@ -135,15 +136,15 @@ const DashboardLayout = () => {
           <div className="logo-square">NIT</div>
           <span className="logo-text">CodeBattle</span>
         </div>
-        
+
         <nav className="sidebar-nav">
           {filteredNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             return (
-              <Link 
-                key={item.path} 
-                to={item.path} 
+              <Link
+                key={item.path}
+                to={item.path}
                 className={`nav-link ${isActive ? 'active' : ''}`}
                 title={item.label}
               >
@@ -153,7 +154,7 @@ const DashboardLayout = () => {
             )
           })}
         </nav>
-        
+
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={handleLogout} title="Sign Out">
             <LogOut size={18} className="nav-icon" />
@@ -161,7 +162,7 @@ const DashboardLayout = () => {
           </button>
         </div>
       </aside>
-      
+
       <main className="main-content">
         <header className="top-header glass-header">
           <div className="header-left">
@@ -171,7 +172,7 @@ const DashboardLayout = () => {
             <div className="user-profile">
               <div className="user-info">
                 <span className="user-name">{userName}</span>
-                <span className="user-role-badge" style={{backgroundColor: getUserBadge().color}}>
+                <span className="user-role-badge" style={{ backgroundColor: getUserBadge().color }}>
                   {getUserBadge().label}
                 </span>
               </div>
@@ -179,7 +180,7 @@ const DashboardLayout = () => {
             </div>
           </div>
         </header>
-        
+
         <div className="page-wrapper">
           <Outlet />
         </div>

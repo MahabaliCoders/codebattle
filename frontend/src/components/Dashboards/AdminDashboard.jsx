@@ -9,6 +9,8 @@ const AdminDashboard = () => {
   const [adminName, setAdminName] = useState('System Admin');
   const [loading, setLoading] = useState(true);
 
+  const [allEvents, setAllEvents] = useState([]);
+
   useEffect(() => {
     const user = auth.currentUser || { uid: 'anonymous-user', email: 'admin@example.com' };
 
@@ -23,6 +25,9 @@ const AdminDashboard = () => {
 
     // Listen to full platform metrics
     const unsubEvents = onSnapshot(collection(db, 'events'), (snap) => {
+      const evList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      evList.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      setAllEvents(evList);
       setMetrics(prev => ({ ...prev, events: snap.size }));
     });
     
@@ -90,18 +95,54 @@ const AdminDashboard = () => {
         </div>
       </section>
 
-      <section className="recent-activity glass-card">
-        <h3>Live System Tracking</h3>
-        <div className="activity-list">
-          <div className="activity-item">
-            <div className="activity-icon bg-success">✓</div>
-            <div className="activity-details">
-              <p>Platform operating with real-time Firebase Sync Protocol</p>
-              <span style={{color: '#10b981'}}>Live</span>
-            </div>
+      <div className="admin-content-layout">
+        <section className="events-monitoring glass-card">
+          <div className="section-header-row">
+             <h3>Recent Platform Events</h3>
+             <span className="view-all-tag">Full Visibility</span>
           </div>
-        </div>
-      </section>
+          <div className="activity-list">
+            {allEvents.length === 0 ? (
+              <p className="empty-msg">No events have been initialized yet.</p>
+            ) : (
+              allEvents.map(event => (
+                <div key={event.id} className="activity-item">
+                  <div className="activity-icon bg-primary">📅</div>
+                  <div className="activity-details">
+                    <p><span>{event.eventName}</span> ({event.eventType})</p>
+                    <span>{event.date} • {event.time} • Coordinator: {event.coordinatorName}</span>
+                  </div>
+                  <div className={`status-badge-mini ${event.status || 'upcoming'}`}>
+                    {event.status?.toUpperCase() || 'UPCOMING'}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="recent-activity glass-card">
+          <h3>Live System Tracking</h3>
+          <div className="activity-list">
+            <div className="activity-item">
+              <div className="activity-icon bg-success">✓</div>
+              <div className="activity-details">
+                <p>Platform operating with real-time Firebase Sync Protocol</p>
+                <span style={{color: '#10b981'}}>Live</span>
+              </div>
+            </div>
+            {allEvents.length > 0 && (
+              <div className="activity-item">
+                <div className="activity-icon bg-info">i</div>
+                <div className="activity-details">
+                  <p>New event "{allEvents[0].eventName}" synced from cloud</p>
+                  <span>Recently Updated</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

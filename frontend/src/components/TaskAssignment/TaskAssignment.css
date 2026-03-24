@@ -141,6 +141,24 @@
   color: #86868b;
 }
 
+.status-flow-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-next-arrow {
+  color: #86868b;
+  opacity: 0.5;
+  animation: slide-arrow 2s infinite ease-in-out;
+}
+
+@keyframes slide-arrow {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
 .premium-task-title {
   font-size: 1.15rem;
   font-weight: 800;
