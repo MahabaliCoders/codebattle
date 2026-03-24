@@ -13,6 +13,7 @@ import {
   Calendar,
   Search,
   BookOpen,
+  Image as ImageIcon,
   MessageSquare
 } from 'lucide-react';
 import { auth, db } from '../../firebase';
@@ -86,6 +87,7 @@ const DashboardLayout = () => {
     // Reporting (Admin & Lead)
     { path: '/dashboard/reports', label: 'Reports', icon: FileText, roles: ['admin'] },
     { path: '/dashboard/alerts', label: 'Alerts & Notifications', icon: Bell, roles: ['admin', 'lead', 'event-lead'] },
+    { path: '/dashboard/posters', label: 'Poster Studio', icon: ImageIcon, roles: ['admin', 'lead', 'event-lead'] },
     
     // Community
     { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
