@@ -52,6 +52,7 @@
 
 body {
   margin: 0;
+  overflow-x: hidden; /* GLOBAL FIX */
 }
 
 #root {
@@ -59,6 +60,7 @@ body {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden; /* GLOBAL FIX */
 }
 
 h1,

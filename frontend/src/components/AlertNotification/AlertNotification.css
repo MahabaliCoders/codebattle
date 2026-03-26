@@ -1,7 +1,8 @@
 .alerts-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 40px 0;
+  width: 100%;
+  max-width: none; /* TRULY WIDE */
+  box-sizing: border-box;
 }
 
 .alerts-header {
@@ -29,25 +30,44 @@
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.75rem;
+  margin-right: 200px;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(255,59,48,0.2);
+  border: 1px solid rgba(255, 59, 48, 0.2);
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.alerts-layout {
+.alerts-layout.no-panel {
   display: grid;
-  grid-template-columns: 350px 1fr;
+  grid-template-columns: 1fr;
+  width: 100%;
+}
+
+.alerts-layout.with-panel {
+  display: grid;
+  grid-template-columns: 280px 1fr; /* SHORTER ADMIN PANEL */
   gap: 32px;
   align-items: start;
+  width: 100%;
 }
 
 .broadcaster-panel {
@@ -75,27 +95,33 @@
   gap: 16px;
 }
 
-.broadcast-form input, .broadcast-form textarea, .broadcast-form select {
+.broadcast-form input,
+.broadcast-form textarea,
+.broadcast-form select {
   width: 100%;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   background: white;
   font-size: 0.95rem;
-  color: #000; /* BLACK INPUT TEXT */
+  color: #000;
+  /* BLACK INPUT TEXT */
   font-weight: 500;
   transition: all 0.2s;
 }
 
-.broadcast-form input::placeholder, .broadcast-form textarea::placeholder {
+.broadcast-form input::placeholder,
+.broadcast-form textarea::placeholder {
   color: #86868b;
   font-weight: 400;
 }
 
-.broadcast-form input:focus, .broadcast-form textarea:focus, .broadcast-form select:focus {
+.broadcast-form input:focus,
+.broadcast-form textarea:focus,
+.broadcast-form select:focus {
   outline: none;
   border-color: #007aff;
-  box-shadow: 0 0 0 4px rgba(0,122,255,0.1);
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
 .broadcast-form textarea {
@@ -121,7 +147,7 @@
 .btn-send-broadcast:hover {
   background: #0066cc;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,122,255,0.2);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
 }
 
 .notifications-feed {
@@ -131,21 +157,26 @@
   max-height: calc(100vh - 200px);
   overflow-y: auto;
   padding-right: 8px;
+  max-width: 800px; /* SHORTEN CARD LENGTH FOR LEADS */
+  scrollbar-width: none; /* FIREFOX */
+  -ms-overflow-style: none; /* IE/EDGE */
 }
 
-/* APPLE STYLE SCROLLBAR */
 .notifications-feed::-webkit-scrollbar {
-  width: 6px;
+  display: none; /* CHROME/SAFARI/BRAVE */
 }
+
 .notifications-feed::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .notifications-feed::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
+
 .notifications-feed:hover::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .notification-card {
@@ -154,8 +185,8 @@
   padding: 20px;
   display: flex;
   gap: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
 }
 
@@ -163,13 +194,29 @@
   transform: translateX(4px);
 }
 
-.border-info { border-left: 6px solid #007aff; }
-.border-warning { border-left: 6px solid #ff9500; }
-.border-success { border-left: 6px solid #34c759; }
+.border-info {
+  border-left: 6px solid #007aff;
+}
 
-.text-info { color: #007aff; }
-.text-warning { color: #ff9500; }
-.text-success { color: #34c759; }
+.border-warning {
+  border-left: 6px solid #ff9500;
+}
+
+.border-success {
+  border-left: 6px solid #34c759;
+}
+
+.text-info {
+  color: #007aff;
+}
+
+.text-warning {
+  color: #ff9500;
+}
+
+.text-success {
+  color: #34c759;
+}
 
 .note-icon-wrap {
   width: 40px;
@@ -220,7 +267,7 @@
   align-items: center;
   font-size: 0.8rem;
   color: #86868b;
-  border-top: 1px solid rgba(0,0,0,0.03);
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
   padding-top: 10px;
 }
 
@@ -241,9 +288,9 @@
   padding: 60px;
   text-align: center;
   color: #86868b;
-  background: rgba(0,0,0,0.02);
+  background: rgba(0, 0, 0, 0.02);
   border-radius: 16px;
-  border: 2px dashed rgba(0,0,0,0.05);
+  border: 2px dashed rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 1024px) {

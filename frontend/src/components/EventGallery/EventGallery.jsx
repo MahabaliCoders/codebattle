@@ -13,14 +13,18 @@ const EventGallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [newImage, setNewImage] = useState({ url: '', category: 'technical', title: '' });
   
-  const userRole = localStorage.getItem('userRole')?.toLowerCase() || 'user';
+  const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole')?.toLowerCase() || 'user');
   const canManage = ['lead', 'event-lead', 'event lead', 'admin'].includes(userRole);
 
-  // 1. Fetch Events
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'events'), (snap) => {
       const evs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      console.log("Mission Archives Synced:", evs.length, "missions found.");
       setEvents(evs);
+      setLoading(false);
+    }, (err) => {
+      console.error("Gallery Access Error:", err);
+      // Fallback if access denied
       setLoading(false);
     });
     return () => unsub();

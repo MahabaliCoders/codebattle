@@ -19,18 +19,18 @@ const AdminDashboard = () => {
       try {
         const d = await getDoc(doc(db, 'users', user.uid));
         if (d.exists() && d.data().name) setAdminName(d.data().name);
-      } catch(e) {}
+      } catch (e) { }
     };
     fetchAdmin();
 
     // Listen to full platform metrics
     const unsubEvents = onSnapshot(collection(db, 'events'), (snap) => {
       const evList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      evList.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      evList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
       setAllEvents(evList);
       setMetrics(prev => ({ ...prev, events: snap.size }));
     });
-    
+
     // Listen to active leads specifically
     const qLeads = query(collection(db, 'users'), where('role', '==', 'event-lead'));
     const unsubLeads = onSnapshot(qLeads, (snap) => {
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
     return () => { unsubEvents(); unsubLeads(); unsubRegs(); };
   }, []);
 
-  if(loading) return <div className="loading-dashboard">Loading central administration data...</div>
+  if (loading) return <div className="loading-dashboard">Loading central administration data...</div>
 
   return (
     <div className="admin-page-content fade-in">
@@ -58,48 +58,48 @@ const AdminDashboard = () => {
           <div className="user-details-text">
             <span className="user-email-text">System Administrator</span>
           </div>
-          <div className="avatar-circle" style={{background: '#ef4444'}}>
-            {adminName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase()}
+          <div className="avatar-circle" style={{ background: '#ef4444' }}>
+            {adminName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
           </div>
         </div>
       </header>
 
       <section className="stats-grid">
         <div className="stat-card glass-card">
-           <div className="stat-header">
+          <div className="stat-header">
             <h4>Total Events</h4>
             <Calendar size={20} className="text-primary" />
           </div>
           <p className="stat-value text-primary">{metrics.events}</p>
         </div>
         <div className="stat-card glass-card">
-           <div className="stat-header">
+          <div className="stat-header">
             <h4>Active Coordinators</h4>
             <ShieldCheck size={20} className="text-warning" />
           </div>
           <p className="stat-value">{metrics.leads}</p>
         </div>
         <div className="stat-card glass-card">
-           <div className="stat-header">
+          <div className="stat-header">
             <h4>Total Participants</h4>
             <Users size={20} className="text-success" />
           </div>
           <p className="stat-value">{metrics.participants}</p>
         </div>
         <div className="stat-card glass-card">
-           <div className="stat-header">
+          <div className="stat-header">
             <h4>Platform Status</h4>
             <BarChart3 size={20} className="text-info" />
           </div>
-          <p className="stat-value text-info" style={{fontSize: '1.2rem', marginTop:'0.5rem'}}>Online & Syncing</p>
+          <p className="stat-value text-info" style={{ fontSize: '1.2rem', marginTop: '0.5rem' }}>Online & Syncing</p>
         </div>
       </section>
 
       <div className="admin-content-layout">
         <section className="events-monitoring glass-card">
           <div className="section-header-row">
-             <h3>Recent Platform Events</h3>
-             <span className="view-all-tag">Full Visibility</span>
+            <h3>Recent Platform Events</h3>
+
           </div>
           <div className="activity-list">
             {allEvents.length === 0 ? (
@@ -128,7 +128,7 @@ const AdminDashboard = () => {
               <div className="activity-icon bg-success">✓</div>
               <div className="activity-details">
                 <p>Platform operating with real-time Firebase Sync Protocol</p>
-                <span style={{color: '#10b981'}}>Live</span>
+                <span style={{ color: '#10b981' }}>Live</span>
               </div>
             </div>
             {allEvents.length > 0 && (

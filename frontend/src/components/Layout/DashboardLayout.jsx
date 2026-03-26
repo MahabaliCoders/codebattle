@@ -95,8 +95,8 @@ const DashboardLayout = () => {
     { path: '/dashboard/posters', label: 'Poster Studio', icon: ImageIcon, roles: ['admin', 'lead', 'event-lead'] },
 
     // Community & Content
-    { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
-    { path: '/dashboard/gallery', label: 'Mission Gallery', icon: ImageIcon, roles: ['admin', 'lead', 'event-lead', 'user', 'participant'] },
+    { path: '/dashboard/community', label: 'Community Chat', icon: MessageSquare, roles: ['admin', 'lead', 'event-lead', 'event lead', 'user', 'participant'] },
+    { path: '/dashboard/gallery', label: 'Gallery', icon: ImageIcon, roles: ['admin', 'lead', 'event-lead', 'event lead', 'user', 'participant', 'User', 'Lead'] },
   ];
 
 
@@ -133,8 +133,8 @@ const DashboardLayout = () => {
     <div className="dashboard-layout fade-in">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div className="logo-square">NIT</div>
-          <span className="logo-text">CodeBattle</span>
+          <div className="logo-square">MC</div>
+          <span className="logo-text">Organize</span>
         </div>
 
         <nav className="sidebar-nav">

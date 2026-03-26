@@ -3,10 +3,36 @@ import { Users, Search, DownloadCloud, FileText } from 'lucide-react';
 import './ParticipantRegistration.css';
 import { db } from '../../firebase';
 import { collection, onSnapshot, getDocs } from 'firebase/firestore';
+import * as XLSX from 'xlsx';
 
 const ParticipantRegistration = () => {
   const [participants, setParticipants] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const handleExport = () => {
+    if (participants.length === 0) return;
+    
+    // Prepare data for Excel
+    const exportData = participants.map(p => ({
+      'Participant Name': p.fullName,
+      'Email Address': p.email,
+      'College': p.college,
+      'Event Name': p.eventName,
+      'Category': p.participationType,
+      'Registration Date': p.registrationDate,
+      'Status': 'Confirmed'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Participants');
+    
+    // Auto-size columns (rough estimate)
+    const max_widths = [25, 30, 20, 25, 15, 15, 10];
+    worksheet['!cols'] = max_widths.map(w => ({ wch: w }));
+
+    XLSX.writeFile(workbook, `CodeBattle_Participants_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,8 +96,12 @@ const ParticipantRegistration = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="btn-export-records">
-            <DownloadCloud size={16} /> Export
+          <button 
+            className="btn-export-records" 
+            onClick={handleExport}
+            disabled={participants.length === 0}
+          >
+            <DownloadCloud size={16} /> Export (Excel)
           </button>
         </div>
       </div>
@@ -80,7 +110,6 @@ const ParticipantRegistration = () => {
         <table className="participants-table">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Participant Details</th>
               <th>Event Registered</th>
               <th>Type</th>
@@ -91,7 +120,6 @@ const ParticipantRegistration = () => {
           <tbody>
             {filteredParticipants.map(participant => (
               <tr key={participant.id}>
-                <td className="id-col">{participant.id}</td>
                 <td>
                   <div className="participant-info">
                     <span className="p-name">{participant.fullName}</span>

@@ -1,32 +1,40 @@
-/* EVENT GALLERY PREMIUM STYLES */
 .gallery-container {
-  padding: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 40px 0; /* Align left */
+  width: 100%;
 }
 
 .gallery-header-premium {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+  justify-content: flex-start; /* FORCE START */
+  gap: 40px;
+  align-items: flex-end;
+  margin-bottom: 48px;
   border-bottom: 1px solid rgba(0,0,0,0.05);
   padding-bottom: 32px;
 }
 
+.header-left-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
 .header-left-gallery h1 {
-  font-size: 2.25rem;
+  font-size: 2.75rem;
   font-weight: 700;
-  color: #000;
-  margin: 0 0 8px 0;
-  letter-spacing: -1px;
+  color: #000; /* BLACK */
+  margin: 0 0 4px 0;
+  letter-spacing: -1.5px;
 }
 
 .header-left-gallery h2 {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #000; /* BLACK */
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .gallery-breadcrumb {
@@ -75,8 +83,9 @@
 /* EVENT CARDS */
 .events-gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  max-width: 900px;
 }
 
 .event-gallery-card {
@@ -143,7 +152,7 @@
 .event-type-pill {
   font-size: 0.65rem;
   font-weight: 700;
-  color: #86868b;
+  color: #000;
   background: #f5f5f7;
   padding: 4px 10px;
   border-radius: 100px;
@@ -159,7 +168,7 @@
 }
 
 .event-gallery-card p {
-  color: #444;
+  color: #000;
   font-size: 0.9rem;
   margin: 0;
 }
@@ -177,7 +186,7 @@
 /* MASONRY GRID */
 .gallery-masonry-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(2, 1fr); /* FORCED 2 COLUMNS */
   gap: 32px;
 }
 
@@ -260,7 +269,7 @@
 
 .uploader-meta {
   font-size: 0.75rem;
-  color: #86868b;
+  color: #000;
   font-weight: 500;
 }
 

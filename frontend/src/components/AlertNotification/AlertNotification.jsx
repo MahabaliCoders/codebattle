@@ -9,7 +9,7 @@ const AlertNotification = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newAlert, setNewAlert] = useState({ title: '', message: '', type: 'info' });
-  
+
   const userRole = localStorage.getItem('userRole')?.toLowerCase() || 'user';
   const canBroadcast = ['admin', 'lead', 'event-lead'].includes(userRole);
 
@@ -65,31 +65,31 @@ const AlertNotification = () => {
           <p>Important updates and real-time event announcements.</p>
         </div>
         <div className="live-pill">
-           <Bell size={14} /> LIVE FEED
+          LIVE
         </div>
       </header>
 
-      <div className="alerts-layout">
+      <div className={`alerts-layout ${canBroadcast ? 'with-panel' : 'no-panel'}`}>
         {/* Broadcaster Panel (Admin/Leads Only) */}
         {canBroadcast && (
           <aside className="broadcaster-panel glass-card">
             <div className="panel-head">
-               <ShieldAlert size={18} />
-               <h3>Admin Broadcaster</h3>
+              <ShieldAlert size={18} />
+              <h3>Admin Broadcaster</h3>
             </div>
             <form onSubmit={handleBroadcast} className="broadcast-form">
-              <input 
-                type="text" placeholder="Alert Title" 
-                value={newAlert.title} onChange={e => setNewAlert({...newAlert, title: e.target.value})} 
-                required 
+              <input
+                type="text" placeholder="Alert Title"
+                value={newAlert.title} onChange={e => setNewAlert({ ...newAlert, title: e.target.value })}
+                required
               />
-              <textarea 
-                placeholder="Compose your message to all participants..." 
-                value={newAlert.message} onChange={e => setNewAlert({...newAlert, message: e.target.value})} 
-                required 
+              <textarea
+                placeholder="Compose your message to all participants..."
+                value={newAlert.message} onChange={e => setNewAlert({ ...newAlert, message: e.target.value })}
+                required
               />
               <div className="type-selector">
-                <select value={newAlert.type} onChange={e => setNewAlert({...newAlert, type: e.target.value})}>
+                <select value={newAlert.type} onChange={e => setNewAlert({ ...newAlert, type: e.target.value })}>
                   <option value="info">Information (Blue)</option>
                   <option value="warning">Urgent Warning (Yellow)</option>
                   <option value="success">Success / Celebration (Green)</option>
@@ -115,17 +115,17 @@ const AlertNotification = () => {
                   <div className="note-top">
                     <h4>{note.title}</h4>
                     <span className="note-time">
-                      <Clock size={12} /> {note.createdAt?.toDate() ? note.createdAt.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now'}
+                      <Clock size={12} /> {note.createdAt?.toDate() ? note.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                     </span>
                   </div>
                   <p>{note.message}</p>
                   <div className="note-footer">
-                     <span>From: {note.senderName}</span>
-                     {canBroadcast && (
-                       <button className="btn-delete-note" onClick={() => handleDelete(note.id)}>
-                         <Trash2 size={14} />
-                       </button>
-                     )}
+                    <span>From: {note.senderName}</span>
+                    {canBroadcast && (
+                      <button className="btn-delete-note" onClick={() => handleDelete(note.id)}>
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

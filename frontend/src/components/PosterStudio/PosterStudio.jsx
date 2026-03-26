@@ -498,17 +498,22 @@ const PosterStudio = () => {
       
       {editingTextId && (
         <textarea
-          className="html-text-editor shadow-pulse"
+          className="html-text-editor-premium"
           value={editValue} onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={(e) => { if(e.key === 'Escape') finishTextEdit(); }}
+          onKeyDown={(e) => { 
+            if(e.key === 'Escape') finishTextEdit();
+            if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); finishTextEdit(); }
+          }}
           onBlur={finishTextEdit} autoFocus
           style={{
-            position: 'absolute', top: textInputPos.y, left: textInputPos.x,
-            width: Math.max(200, textInputPos.width + 40), height: Math.max(50, textInputPos.height + 40),
-            fontSize: textInputPos.fontSize, lineHeight: 1.2, margin: 0, padding: 0, border: 'none', outline: 'none', background: 'transparent',
+            position: 'absolute', top: textInputPos.y - 10, left: textInputPos.x - 10,
+            width: Math.max(250, textInputPos.width + 50), height: Math.max(60, textInputPos.height + 50),
+            fontSize: textInputPos.fontSize, lineHeight: 1.2, margin: 0, padding: '10px',
+            border: '2px solid #007aff', outline: 'none', background: 'rgba(255,255,255,0.95)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.15)', borderRadius: '12px',
             color: selectedNodeInfo?.fill || '#000', fontFamily: selectedNodeInfo?.fontFamily || 'sans-serif',
             fontWeight: selectedNodeInfo?.fontStyle?.includes('bold') ? 'bold' : 'normal',
-            zIndex: 1000, resize: 'none', overflow: 'hidden'
+            zIndex: 1000, resize: 'none', overflow: 'hidden', textAlign: selectedNodeInfo?.align || 'left'
           }}
         />
       )}
@@ -541,9 +546,9 @@ const PosterStudio = () => {
       {/* Secondary Wide Sidebar */}
       <aside className={`secondary-sidebar-panel ${panelOpen ? 'open' : 'closed'}`}>
         <div className="panel-header">
-           <div className="ai-wrap">
-             <input type="text" placeholder="Generate basic layout..." value={prompt} onChange={e => setPrompt(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAI()} />
-             <button className="ai-gen-btn" onClick={handleAI}><Sparkle size={14} style={{marginRight: 6, display: 'inline-block'}} />Generate Design</button>
+           <div className="panel-header-title">
+             <Wrench size={18} />
+             <h3>Mission Elements</h3>
            </div>
         </div>
         <div className="panel-scroll-grid">
@@ -698,15 +703,16 @@ const PosterStudio = () => {
       </main>
 
       {/* Floating Bottom Footer Toolbar */}
-      <footer className="studio-footer-glass">
-         <button className="footer-btn"><StickyNote size={16}/> Notes</button>
-         <button className="footer-btn"><Activity size={16}/> {prompt ? 'Generation Running...' : '00:00 Timer'}</button>
+       <footer className="studio-footer-glass">
+          <div className="footer-status">
+             <div className="status-dot"></div>
+             <span>System Ready</span>
+          </div>
          
          <div className="zoom-slider-wrap">
            <button onClick={() => setZoom(Math.max(0.1, zoom - 0.1))}><ZoomOut size={16}/></button>
            <input type="range" min="0.1" max="2" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} />
            <button onClick={() => setZoom(Math.min(2, zoom + 0.1))}><ZoomIn size={16}/></button>
-           <span>{Math.round(zoom * 100)}%</span>
          </div>
       </footer>
     </div>

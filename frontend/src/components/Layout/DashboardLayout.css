@@ -75,12 +75,13 @@
 }
 
 .nav-link.active {
-  background-color: #0071e3;
-  color: #fff;
+  background-color: rgba(0, 113, 227, 0.08); /* Transparent Light Blue */
+  color: #0071e3; /* PRIMARY BLUE TEXT */
+  font-weight: 600;
 }
 
 .nav-link.active .nav-icon {
-  color: #fff;
+  color: #0071e3; /* PRIMARY BLUE ICON */
 }
 
 .nav-icon {
@@ -118,6 +119,7 @@
   background-color: #fbfbfd;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden; /* REMOVE HORIZONTAL SCROLL */
 }
 
 .top-header.glass-header {
@@ -145,26 +147,45 @@
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
-.user-profile span {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #515154;
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #000; /* GLOBAL BLACK REQUIREMENT */
+}
+
+.user-role-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 100px; /* PILL DESIGN */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .avatar {
   background: #0071e3;
   color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
 }
 
 .loading-spinner {
@@ -200,8 +221,9 @@
 .page-wrapper {
   padding: 40px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* ALIGN TO LEFT FOR ALL VIEWS */
   flex-grow: 1;
+  width: 100%;
 }
 
 /* Centered container for Event Planning */

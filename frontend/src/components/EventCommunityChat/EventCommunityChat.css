@@ -1,18 +1,18 @@
-/* PREMIUM COMMUNITY CHAT OVERHAUL */
+/* PREMIUM COMMUNITY CHAT OVERHAUL - LIGHT MODE */
 .chat-module-container {
   display: flex;
   height: calc(100vh - 120px);
-  background: #121212;
+  background: #ffffff; /* WHITE */
   border-radius: 32px;
   overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08); /* SOFTER SHADOW */
   margin-top: 24px;
 }
 
 .chat-sidebar-modern {
   width: 320px;
-  background: #1c1c1e;
-  border-right: 1px solid rgba(255,255,255,0.05);
+  background: #f5f5f7; /* APPLE LIGHT GRAY */
+  border-right: 1px solid rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
 }
@@ -22,13 +22,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #86868b;
+  color: #1d1d1f;
 }
 
 .sidebar-title-text {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: #000; /* BLACK */
   letter-spacing: -0.5px;
 }
 
@@ -50,18 +50,18 @@
 }
 
 .event-item-modern:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.03);
 }
 
 .event-item-modern.active {
-  background: #2c2c2e;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .event-icon-circle {
   width: 44px; height: 44px;
   background: #007aff;
-  color: white;
+  color: #ffffff;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -79,7 +79,7 @@
 .ev-name-text {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #fff;
+  color: #000; /* BLACK */
 }
 
 .ev-status-tag {
@@ -108,20 +108,20 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #000;
+  background: #ffffff; /* WHITE */
 }
 
 .chat-header-glass {
   padding: 24px 32px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(255,255,255,0.8);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .chat-title-main {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #fff;
+  color: #000; /* BLACK */
   margin-bottom: 16px;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .nav-pill {
-  background: #1c1c1e;
+  background: #f2f2f7;
   border: none;
   color: #86868b;
   padding: 10px 18px;
@@ -146,41 +146,40 @@
 }
 
 .nav-pill.active {
-  background: #fff;
-  color: #000;
+  background: #1d1d1f;
+  color: #ffffff;
 }
 
 .message-input-area-premium {
   padding: 24px 32px 32px;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8));
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.8));
 }
 
 .chat-input-row {
   display: flex;
   gap: 16px;
   align-items: center;
-  background: #1c1c1e;
+  background: #f2f2f7;
   padding: 10px 10px 10px 24px;
   border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.03);
 }
 
 .premium-chat-input {
   flex: 1;
   background: transparent;
   border: none;
-  color: #fff; /* INPUT TEXT IN DARK CHAT REMAINS BRIGHT FOR LEGIBILITY ON DARK BG */
+  color: #000; /* BLACK INPUT */
   font-size: 1rem;
   font-weight: 500;
 }
-/* WAIT, USER ASKED FOR BLACK INPUT IN ALERTS, BUT FOR CHAT (DARK THEME) I WILL MAKE IT HIGH CONTRAST */
-/* If the user really wants literal black background input, I will follow for the alerts. */
 
 .premium-chat-input:focus { outline: none; }
 
 .send-action-btn {
   width: 44px; height: 44px;
-  background: #fff;
-  color: #000;
+  background: #007aff;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   display: flex;
@@ -190,20 +189,21 @@
   transition: all 0.2s;
 }
 
-.send-action-btn:hover:not(:disabled) { transform: scale(1.05); background: #007aff; color: #fff; }
+.send-action-btn:hover:not(:disabled) { transform: scale(1.05); background: #0066cc; }
 
 .announcement-lock-msg {
   text-align: center;
   color: #86868b;
   font-size: 0.85rem;
   padding: 12px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.03);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
+
 .message-list {
   flex: 1;
   overflow-y: auto;
@@ -221,20 +221,22 @@
   max-width: 70%;
   padding: 16px 20px;
   border-radius: 24px;
-  background: #1c1c1e;
-  border: 1px solid rgba(255,255,255,0.05);
+  background: #f2f2f7;
+  border: 1px solid rgba(0,0,0,0.02);
   position: relative;
+  color: #000;
 }
 
 .message-mine .message-bubble {
-  background: #34c759;
-  color: #fff;
+  background: #007aff;
+  color: #ffffff;
+  border: none;
 }
 
 .message-sender {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #86868b;
+  color: #1d1d1f;
   margin-bottom: 6px;
   display: flex;
   align-items: center;
@@ -242,25 +244,25 @@
 }
 
 .role-badge {
-  background: #007aff;
-  color: white;
+  background: rgba(0, 122, 255, 0.1);
+  color: #007aff;
   font-size: 0.65rem;
   padding: 2px 8px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 4px;
+  font-weight: 700;
 }
 
 .message-text {
   font-size: 0.95rem;
   line-height: 1.5;
-  color: #fff;
 }
 
 .message-time {
   font-size: 0.65rem;
-  color: rgba(255,255,255,0.4);
+  color: #86868b;
   margin-top: 8px;
   text-align: right;
 }
@@ -268,7 +270,7 @@
 .no-event-selected-msg, .empty-sidebar-msg {
   padding: 40px;
   text-align: center;
-  color: #48484a;
+  color: #86868b;
   font-size: 0.9rem;
 }
 
